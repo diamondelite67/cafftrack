@@ -1,4 +1,5 @@
 const STORAGE_KEY = "caffTrackData";
+const APP_VERSION = "1.0.0";
 
 let data = loadData();
 let devDate = null;
