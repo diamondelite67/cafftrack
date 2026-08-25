@@ -2056,6 +2056,11 @@ function updateApp() {
 
     updateDev();
 
+    setText(
+        "appVersion",
+        APP_VERSION
+    );
+
 }
 
 
