@@ -896,6 +896,53 @@ h2 {
 /* ============================================================
    COMMITMENT SCREEN
 ============================================================ */
+/* =========================
+   APP VERSION
+========================= */
+
+.app-version {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    margin-top: 18px;
+    padding: 15px 17px;
+
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 17px;
+
+    box-shadow: var(--shadow);
+}
+
+.version-icon {
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 11px;
+    background: #edf7f0;
+
+    font-size: 18px;
+}
+
+.app-version strong,
+.app-version small {
+    display: block;
+}
+
+.app-version strong {
+    font-size: 13px;
+}
+
+.app-version small {
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 10px;
+}
 
 .commitment-screen {
     position: fixed;
