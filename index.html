@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CaffTrack</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!-- COMMITMENT / ONBOARDING -->
+<div id="commitmentScreen" class="commitment-screen">
+
+    <div class="commitment-card">
+
+        <div class="commitment-icon">
+            🌱
+        </div>
+
+        <p class="eyebrow">
+            WELCOME TO CAFFTRACK
+        </p>
+
+        <h1>
+            Ready to make a change?
+        </h1>
+
+        <p>
+            CaffTrack helps you understand your caffeine use,
+            track your progress, and work toward becoming
+            caffeine-free.
+        </p>
+
+        <p>
+            When you're ready, make your commitment.
+            Your journey starts today.
+        </p>
+
+        <button
+            id="commitButton"
+            class="commitment-button"
+            type="button"
+            onclick="commitToQuit()"
+        >
+            I'm Ready — Commit
+        </button>
+
+        <small>
+            You can still track caffeine after committing.
+            One day doesn't erase your progress.
+        </small>
+
+    </div>
+
+</div>
+
+
+<div class="app">
+
+    <!-- HOME -->
+    <main id="homePage">
+
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">CAFFTRACK</p>
+                <h1 id="greeting">Good morning.</h1>
+            </div>
+
+            <button
+                class="icon-button"
+                type="button"
+                onclick="showPage('settings')"
+            >
+                ⚙️
+            </button>
+        </header>
+
+        <!-- ENCOURAGEMENT -->
+        <section class="encouragement">
+
+            <div class="encouragement-icon">
+                🌱
+            </div>
+
+            <div>
+                <p class="eyebrow">KEEP GOING</p>
+
+                <h2 id="encouragementText">
+                    One day at a time.
+                </h2>
+            </div>
+
+        </section>
+
+
+        <!-- TODAY -->
+        <section class="section">
+
+            <p class="eyebrow">YOUR DASHBOARD</p>
+
+            <h2>Overview</h2>
+
+            <div class="today-card">
+
+                <div class="today-top">
+
+                    <div>
+
+                        <p class="card-label">
+                            TODAY
+                        </p>
+
+                        <div class="caffeine-number">
+
+                            <span id="todayCaffeine">
+                                0
+                            </span>
+
+                            <small>
+                                mg
+                            </small>
+
+                        </div>
+
+                    </div>
+
+                    <div class="coffee-icon">
+                        ☕
+                    </div>
+
+                </div>
+
+
+                <div class="divider"></div>
+
+
+                <div class="today-stats">
+
+                    <div>
+                        <strong id="drinkCount">
+                            0
+                        </strong>
+
+                        <span>
+                            drinks
+                        </span>
+                    </div>
+
+
+                    <div>
+                        <strong id="streak">
+                            0
+                        </strong>
+
+                        <span>
+                            day streak
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <button
+                class="log-button"
+                type="button"
+                onclick="openLogger()"
+            >
+
+                <span>
+                    +
+                </span>
+
+                Log caffeine
+
+            </button>
+
+        </section>
+
+
+        <!-- WEEKLY -->
+        <section class="section">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <p class="eyebrow">
+                        LAST 7 DAYS
+                    </p>
+
+                    <h2 id="weeklyTotal">
+                        0 mg
+                    </h2>
+
+                </div>
+
+                <span class="muted">
+                    Weekly
+                </span>
+
+            </div>
+
+
+            <div class="card chart-card">
+
+                <div
+                    id="weeklyBars"
+                    class="bars"
+                ></div>
+
+            </div>
+
+        </section>
+
+
+        <!-- STATS -->
+        <section class="section">
+
+            <p class="eyebrow">
+                INSIGHTS
+            </p>
+
+            <h2>
+                Quick Stats
+            </h2>
+
+
+            <div class="stats-grid">
+
+                <div class="card stat-card">
+
+                    <div class="widget-icon">
+                        🌱
+                    </div>
+
+                    <p>
+                        CAFFEINE-FREE DAYS
+                    </p>
+
+                    <h3 id="freeDays">
+                        0
+                    </h3>
+
+                    <span
+                        id="freeDaysSince"
+                        class="muted"
+                    >
+                        Since today
+                    </span>
+
+                </div>
+
+
+                <div class="card stat-card">
+
+                    <div class="widget-icon">
+                        📊
+                    </div>
+
+                    <p>
+                        THIS WEEK
+                    </p>
+
+                    <h3>
+
+                        <span id="weeklyTotalStats">
+                            0
+                        </span>
+
+                        <small>
+                            mg
+                        </small>
+
+                    </h3>
+
+                    <span class="muted">
+                        caffeine logged
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- HISTORY -->
+    <main
+        id="historyPage"
+        class="hidden"
+    >
+
+        <header class="page-header">
+
+            <p class="eyebrow">
+                YOUR RECORD
+            </p>
+
+            <h1>
+                History
+            </h1>
+
+            <p class="page-description">
+                See how your caffeine use has changed over time.
+            </p>
+
+        </header>
+
+
+        <div class="summary-card">
+
+            <div>
+
+                <span>
+                    LAST 7 DAYS
+                </span>
+
+                <strong id="historyWeekTotal">
+                    0 mg
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    CAFFEINE-FREE
+                </span>
+
+                <strong id="historyFreeDays">
+                    0 days
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="section">
+
+            <h2>
+                Daily history
+            </h2>
+
+            <div id="historyList"></div>
+
+        </div>
+
+    </main>
+
+
+    <!-- PROGRESS -->
+    <main
+        id="progressPage"
+        class="hidden"
+    >
+
+        <header class="page-header">
+
+            <p class="eyebrow">
+                KEEP GOING
+            </p>
+
+            <h1>
+                Progress
+            </h1>
+
+            <p class="page-description">
+                Your progress is built one day at a time.
+            </p>
+
+        </header>
+
+
+        <div class="progress-grid">
+
+            <div class="card progress-card">
+
+                <span>
+                    🔥
+                </span>
+
+                <small>
+                    CURRENT STREAK
+                </small>
+
+                <strong id="progressStreak">
+                    0
+                </strong>
+
+                <p>
+                    days
+                </p>
+
+            </div>
+
+
+            <div class="card progress-card">
+
+                <span>
+                    🏆
+                </span>
+
+                <small>
+                    BEST STREAK
+                </small>
+
+                <strong id="bestStreak">
+                    0
+                </strong>
+
+                <p>
+                    days
+                </p>
+
+            </div>
+
+
+            <div class="card progress-card">
+
+                <span>
+                    🌱
+                </span>
+
+                <small>
+                    FREE DAYS
+                </small>
+
+                <strong id="progressFreeDays">
+                    0
+                </strong>
+
+                <p>
+                    total
+                </p>
+
+            </div>
+
+
+            <div class="card progress-card">
+
+                <span>
+                    📊
+                </span>
+
+                <small>
+                    7-DAY AVERAGE
+                </small>
+
+                <strong id="weeklyAverage">
+                    0
+                </strong>
+
+                <p>
+                    mg/day
+                </p>
+
+            </div>
+
+
+            <div class="card progress-card">
+
+                <span>
+                    ☕
+                </span>
+
+                <small>
+                    TOTAL LOGGED
+                </small>
+
+                <strong id="totalLogged">
+                    0
+                </strong>
+
+                <p>
+                    mg
+                </p>
+
+            </div>
+
+
+            <div class="card progress-card">
+
+                <span>
+                    📉
+                </span>
+
+                <small>
+                    WEEKLY CHANGE
+                </small>
+
+                <strong id="weeklyChange">
+                    —
+                </strong>
+
+                <p>
+                    vs previous week
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <section class="section">
+
+            <p class="eyebrow">
+                MILESTONES
+            </p>
+
+            <h2>
+                Keep building
+            </h2>
+
+            <div id="milestones"></div>
+
+        </section>
+
+    </main>
+
+
+    <!-- SETTINGS -->
+    <main
+        id="settingsPage"
+        class="hidden"
+    >
+
+        <header class="page-header">
+
+            <p class="eyebrow">
+                CUSTOMIZE
+            </p>
+
+            <h1>
+                Settings
+            </h1>
+
+            <p class="page-description">
+                Manage your CaffTrack data.
+            </p>
+
+        </header>
+
+
+        <div class="settings-card">
+
+            <div class="setting">
+
+                <div>
+
+                    <strong>
+                        Export data
+                    </strong>
+
+                    <small>
+                        Download a backup of your data.
+                    </small>
+
+                </div>
+
+                <button
+                    type="button"
+                    onclick="exportData()"
+                >
+                    Export
+                </button>
+
+            </div>
+
+
+            <div class="setting">
+
+                <div>
+
+                    <strong>
+                        Import data
+                    </strong>
+
+                    <small>
+                        Restore a previous backup.
+                    </small>
+
+                </div>
+
+
+                <label class="button">
+
+                    Import
+
+                    <input
+                        type="file"
+                        accept=".json"
+                        onchange="importData(this.files[0]); this.value='';"
+                    >
+
+                </label>
+
+            </div>
+
+
+            <div class="setting">
+
+                <div>
+
+                    <strong>
+                        Reset CaffTrack
+                    </strong>
+
+                    <small>
+                        Erase all saved data.
+                    </small>
+
+                </div>
+
+                <button
+                    class="danger"
+                    type="button"
+                    onclick="resetData()"
+                >
+                    Reset
+                </button>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+
+    <button
+        class="nav-item active"
+        type="button"
+        onclick="showPage('home')"
+    >
+
+        <span>
+            🏠
+        </span>
+
+        <small>
+            Home
+        </small>
+
+    </button>
+
+
+    <button
+        class="nav-item"
+        type="button"
+        onclick="showPage('history')"
+    >
+
+        <span>
+            📅
+        </span>
+
+        <small>
+            History
+        </small>
+
+    </button>
+
+
+    <button
+        class="nav-item"
+        type="button"
+        onclick="showPage('progress')"
+    >
+
+        <span>
+            📈
+        </span>
+
+        <small>
+            Progress
+        </small>
+
+    </button>
+
+
+    <button
+        class="nav-item"
+        type="button"
+        onclick="showPage('settings')"
+    >
+
+        <span>
+            ⚙️
+        </span>
+
+        <small>
+            Settings
+        </small>
+
+    </button>
+
+</nav>
+
+
+<!-- LOG MODAL -->
+<div
+    id="logger"
+    class="overlay"
+>
+
+    <div class="modal">
+
+        <button
+            class="close-button"
+            type="button"
+            onclick="closeLogger()"
+        >
+            ×
+        </button>
+
+        <div class="modal-icon">
+            ☕
+        </div>
+
+        <p class="eyebrow">
+            LOG CAFFEINE
+        </p>
+
+        <h2>
+            What did you have?
+        </h2>
+
+        <p class="modal-subtitle">
+            Add the drink name and caffeine amount.
+        </p>
+
+
+        <input
+            id="drinkName"
+            class="text-input"
+            type="text"
+            placeholder="Drink name"
+            autocomplete="off"
+        >
+
+
+        <div class="amount-grid">
+
+            <button
+                type="button"
+                onclick="addCaffeine(80)"
+            >
+                80 <small>mg</small>
+            </button>
+
+            <button
+                type="button"
+                onclick="addCaffeine(100)"
+            >
+                100 <small>mg</small>
+            </button>
+
+            <button
+                type="button"
+                onclick="addCaffeine(150)"
+            >
+                150 <small>mg</small>
+            </button>
+
+            <button
+                type="button"
+                onclick="addCaffeine(200)"
+            >
+                200 <small>mg</small>
+            </button>
+
+            <button
+                type="button"
+                onclick="addCaffeine(250)"
+            >
+                250 <small>mg</small>
+            </button>
+
+            <button
+                type="button"
+                onclick="addCaffeine(300)"
+            >
+                300 <small>mg</small>
+            </button>
+
+        </div>
+
+
+        <div class="custom-input">
+
+            <input
+                id="customAmount"
+                type="number"
+                min="1"
+                placeholder="Custom mg"
+            >
+
+            <button
+                type="button"
+                onclick="addCustom()"
+            >
+                Add
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- DEVELOPER -->
+<button
+    id="devButton"
+    type="button"
+    onclick="toggleDev()"
+>
+    DEV
+</button>
+
+
+<div id="devPanel">
+
+    <strong>
+        DEVELOPER MODE
+    </strong>
+
+    <div id="devDate"></div>
+
+
+    <div class="dev-buttons">
+
+        <button
+            type="button"
+            onclick="changeDevDay(-1)"
+        >
+            ← Day
+        </button>
+
+        <button
+            type="button"
+            onclick="resetDev()"
+        >
+            Today
+        </button>
+
+        <button
+            type="button"
+            onclick="changeDevDay(1)"
+        >
+            Day →
+        </button>
+
+    </div>
+
+</div>
+
+
+<script src="script.js"></script>
+
+</body>
+</html>
