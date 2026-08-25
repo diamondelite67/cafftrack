@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CaffTrack</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#3d6f9f">
 </head>
 
 <body>
@@ -548,88 +550,60 @@
         </header>
 
 
-        <div class="settings-card">
+       <div class="settings-card">
 
-            <div class="setting">
-
-                <div>
-
-                    <strong>
-                        Export data
-                    </strong>
-
-                    <small>
-                        Download a backup of your data.
-                    </small>
-
-                </div>
-
-                <button
-                    type="button"
-                    onclick="exportData()"
-                >
-                    Export
-                </button>
-
-            </div>
-
-
-            <div class="setting">
-
-                <div>
-
-                    <strong>
-                        Import data
-                    </strong>
-
-                    <small>
-                        Restore a previous backup.
-                    </small>
-
-                </div>
-
-
-                <label class="button">
-
-                    Import
-
-                    <input
-                        type="file"
-                        accept=".json"
-                        onchange="importData(this.files[0]); this.value='';"
-                    >
-
-                </label>
-
-            </div>
-
-
-            <div class="setting">
-
-                <div>
-
-                    <strong>
-                        Reset CaffTrack
-                    </strong>
-
-                    <small>
-                        Erase all saved data.
-                    </small>
-
-                </div>
-
-                <button
-                    class="danger"
-                    type="button"
-                    onclick="resetData()"
-                >
-                    Reset
-                </button>
-
-            </div>
-
+    <div class="setting">
+        <div>
+            <strong>Export data</strong>
+            <small>Download a backup of your data.</small>
         </div>
 
+        <button onclick="exportData()">Export</button>
+    </div>
+
+    <div class="setting">
+        <div>
+            <strong>Import data</strong>
+            <small>Restore a previous backup.</small>
+        </div>
+
+        <label class="button">
+            Import
+            <input
+                type="file"
+                accept=".json"
+                onchange="importData(this.files[0]); this.value='';"
+            >
+        </label>
+    </div>
+
+    <div class="setting">
+        <div>
+            <strong>Reset CaffTrack</strong>
+            <small>Erase all saved data.</small>
+        </div>
+
+        <button class="danger" onclick="resetData()">Reset</button>
+    </div>
+
+</div>
+
+<!-- APP VERSION -->
+<div class="app-version">
+
+    <div class="version-icon">
+        🌱
+    </div>
+
+    <div>
+        <strong>CaffTrack</strong>
+
+        <small>
+            Version <span id="appVersion">1.0.0</span>
+        </small>
+    </div>
+
+</div>
     </main>
 
 </div>
@@ -868,6 +842,24 @@
 
 
 <script src="script.js"></script>
+    <script>
+
+if ("serviceWorker" in navigator) {
+
+    window.addEventListener(
+        "load",
+        () => {
+
+            navigator.serviceWorker.register(
+                "./service-worker.js"
+            );
+
+        }
+    );
+
+}
+
+</script>
 
 </body>
 </html>
