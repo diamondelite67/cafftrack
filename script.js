@@ -1680,26 +1680,63 @@ function renderMilestones() {
    DEV MODE
 ========================= */
 
-function toggleDev() {
+/* =========================
+   DEV MODE
+========================= */
 
-    const panel =
-        document.getElementById(
-            "devPanel"
-        );
+function isLocalVersion() {
+
+    return (
+        location.hostname === "localhost" ||
+        location.hostname === "127.0.0.1"
+    );
+
+}
 
 
-    if (!panel) {
+function setupDevMode() {
+
+    const devButton =
+        document.getElementById("devButton");
+
+    const devPanel =
+        document.getElementById("devPanel");
+
+    if (!isLocalVersion()) {
+
+        if (devButton) {
+            devButton.remove();
+        }
+
+        if (devPanel) {
+            devPanel.remove();
+        }
 
         return;
-
     }
 
+    updateDev();
+
+}
+
+
+function toggleDev() {
+
+    if (!isLocalVersion()) {
+        return;
+    }
+
+    const panel =
+        document.getElementById("devPanel");
+
+    if (!panel) {
+        return;
+    }
 
     panel.style.display =
         panel.style.display === "block"
             ? "none"
             : "block";
-
 
     updateDev();
 
@@ -1708,18 +1745,18 @@ function toggleDev() {
 
 function changeDevDay(amount) {
 
+    if (!isLocalVersion()) {
+        return;
+    }
+
     const date =
         appDate();
-
 
     date.setDate(
         date.getDate() + amount
     );
 
-
-    devDate =
-        date;
-
+    devDate = date;
 
     updateApp();
 
@@ -1727,6 +1764,10 @@ function changeDevDay(amount) {
 
 
 function resetDev() {
+
+    if (!isLocalVersion()) {
+        return;
+    }
 
     devDate = null;
 
@@ -1738,17 +1779,11 @@ function resetDev() {
 function updateDev() {
 
     const date =
-        document.getElementById(
-            "devDate"
-        );
-
+        document.getElementById("devDate");
 
     if (!date) {
-
         return;
-
     }
-
 
     date.textContent =
         appDate().toLocaleDateString(
@@ -1762,7 +1797,6 @@ function updateDev() {
         );
 
 }
-
 
 /* =========================
    SETTINGS
@@ -2063,16 +2097,17 @@ document.addEventListener(
 ========================= */
 
 document.addEventListener(
-    "keydown",
-    event => {
+    "DOMContentLoaded",
+    () => {
 
-        if (
-            event.key === "Escape"
-        ) {
+        setupDevMode();
 
-            closeLogger();
+        updateApp();
 
-        }
+        setTimeout(
+            showCommitment,
+            100
+        );
 
     }
 );
