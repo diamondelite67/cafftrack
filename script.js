@@ -1,4 +1,5 @@
 const STORAGE_KEY = "caffTrackData";
+const APP_VERSION = "1.1.1";
 
 let data = loadData();
 let devDate = null;
@@ -218,6 +219,7 @@ function showPage(page) {
 
     if (page === "history") {
         renderHistory();
+        preparePastDatePicker();
     }
 
     if (page === "progress") {
@@ -230,8 +232,7 @@ function showPage(page) {
    LOGGER
 ========================= */
 
-function openLogger() {
-
+function openLogger(selectedDate = null) {
     document
         .getElementById("logger")
         .classList.add("active");
@@ -240,33 +241,39 @@ function openLogger() {
         document.getElementById("drinkDate");
 
     if (dateInput) {
-
         dateInput.value =
+            selectedDate ||
             dateKey(appDate());
 
         dateInput.max =
             dateKey(new Date());
-
     }
 
     selectTimeOfDay(
         getSuggestedTimeOfDay()
     );
 
-    setTimeout(() => {
+    clearAmountSelection();
 
+    const customInput =
+        document.getElementById("customAmount");
+
+    if (customInput) {
+        customInput.value = "";
+    }
+
+    setTimeout(() => {
         const input =
             document.getElementById("drinkName");
 
         if (input) {
             input.focus();
         }
-
     }, 100);
-
 }
-function getSuggestedTimeOfDay() {
 
+
+function getSuggestedTimeOfDay() {
     const hour =
         appDate().getHours();
 
@@ -279,28 +286,22 @@ function getSuggestedTimeOfDay() {
     }
 
     return "night";
-
 }
 
 
 function selectTimeOfDay(time) {
-
     document
         .querySelectorAll(".time-button")
         .forEach(button => {
-
             button.classList.toggle(
                 "selected",
                 button.dataset.time === time
             );
-
         });
-
 }
 
 
 function getSelectedTimeOfDay() {
-
     const selected =
         document.querySelector(
             ".time-button.selected"
@@ -309,7 +310,6 @@ function getSelectedTimeOfDay() {
     return selected
         ? selected.dataset.time
         : getSuggestedTimeOfDay();
-
 }
 
 
@@ -321,7 +321,6 @@ function closeLogger() {
 
 
 function addCaffeine(amount) {
-
     amount = Number(amount);
 
     if (!amount || amount <= 0) {
@@ -349,7 +348,6 @@ function addCaffeine(amount) {
         getDayData(selectedDate);
 
     day.entries.push({
-
         id:
             Date.now().toString() +
             Math.random(),
@@ -362,10 +360,15 @@ function addCaffeine(amount) {
 
         timeOfDay:
             timeOfDay
-
     });
 
-    day.caffeine += amount;
+    day.caffeine =
+        day.entries.reduce(
+            (total, entry) =>
+                total +
+                Number(entry.amount || 0),
+            0
+        );
 
     day.drinks =
         day.entries.length;
@@ -380,9 +383,11 @@ function addCaffeine(amount) {
         .getElementById("customAmount")
         .value = "";
 
-    updateApp();
+    clearAmountSelection();
 
+    updateApp();
 }
+
 
 function selectAmount(amount) {
     const customInput =
@@ -390,9 +395,34 @@ function selectAmount(amount) {
 
     if (customInput) {
         customInput.value = amount;
-        customInput.focus();
     }
+
+    document
+        .querySelectorAll(".amount-grid button")
+        .forEach(button => {
+            const buttonAmount =
+                Number(
+                    button.textContent
+                        .replace("mg", "")
+                        .trim()
+                );
+
+            button.classList.toggle(
+                "selected",
+                buttonAmount === Number(amount)
+            );
+        });
 }
+
+
+function clearAmountSelection() {
+    document
+        .querySelectorAll(".amount-grid button")
+        .forEach(button => {
+            button.classList.remove("selected");
+        });
+}
+
 
 function addCustom() {
     const amount =
@@ -416,108 +446,131 @@ function addCustom() {
 /* =========================
    PAST-DATE LOGGING
 ========================= */
+function formatPastDate(input) {
+    let numbers =
+        input.value.replace(/\D/g, "");
 
-/*
-   This is the ONLY button needed
-   for adding caffeine to a previous day.
+    numbers =
+        numbers.slice(0, 8);
 
-   It opens the device's native
-   calendar/date picker.
-*/
+    if (numbers.length >= 5) {
+        input.value =
+            numbers.slice(0, 2) +
+            "/" +
+            numbers.slice(2, 4) +
+            "/" +
+            numbers.slice(4);
+    }
 
-function openPastDrinkLogger() {
+    else if (numbers.length >= 3) {
+        input.value =
+            numbers.slice(0, 2) +
+            "/" +
+            numbers.slice(2);
+    }
+
+    else {
+        input.value = numbers;
+    }
+}
+
+function preparePastDatePicker() {
     const input =
-        document.createElement("input");
+        document.getElementById(
+            "pastDrinkDate"
+        );
 
-    input.type = "date";
+    if (!input) {
+        return;
+    }
 
-    input.max =
-        dateKey(new Date());
-
-    input.style.position = "fixed";
-    input.style.left = "-9999px";
-    input.style.opacity = "0";
-
-    document.body.appendChild(input);
-
-    input.addEventListener(
-        "change",
-        () => {
-            const selectedDate =
-                input.value;
-
-            input.remove();
-
-            if (!selectedDate) {
-                return;
-            }
-
-            addDrinkToPastDay(
-                selectedDate
-            );
-        }
-    );
-
-    input.showPicker
-        ? input.showPicker()
-        : input.click();
+    input.placeholder =
+        "MM/DD/YYYY";
 }
 
 
-function addDrinkToPastDay(dayKey) {
-    const name =
-        prompt("What drink did you have?");
+function pastDateSelected() {
+    const input =
+        document.getElementById(
+            "pastDrinkDate"
+        );
 
-    if (
-        name === null ||
-        !name.trim()
-    ) {
+    if (!input) {
         return;
     }
 
-    const amount =
-        Number(
-            prompt(
-                "How much caffeine did it contain? (mg)"
-            )
+    const value =
+        input.value.trim();
+
+    const match =
+        value.match(
+            /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/
         );
 
-    if (
-        !amount ||
-        amount <= 0
-    ) {
+    if (!match) {
         alert(
-            "Please enter a valid caffeine amount."
+            "Enter the date as MM/DD/YYYY."
         );
+
+        input.focus();
 
         return;
     }
+
+    const month =
+        Number(match[1]);
 
     const day =
-        getDayData(dayKey);
+        Number(match[2]);
 
-    day.entries.push({
-        id:
-            Date.now().toString() +
-            Math.random(),
+    const year =
+        Number(match[3]);
 
-        name:
-            name.trim(),
+    const selected =
+        new Date(
+            year,
+            month - 1,
+            day
+        );
 
-        amount:
-            amount
-    });
+    if (
+        selected.getFullYear() !== year ||
+        selected.getMonth() !== month - 1 ||
+        selected.getDate() !== day
+    ) {
+        alert(
+            "Please enter a valid date."
+        );
 
-    day.caffeine += amount;
+        return;
+    }
 
-    day.drinks =
-        day.entries.length;
+    const today =
+        new Date();
 
-    saveData();
+    today.setHours(
+        23,
+        59,
+        59,
+        999
+    );
 
-    updateApp();
+    if (selected > today) {
+        alert(
+            "You can't log caffeine for a future date."
+        );
 
-    renderHistory();
+        return;
+    }
+
+    const selectedDate =
+        dateKey(selected);
+
+    openLogger(
+        selectedDate
+    );
+
+    input.value = "";
 }
 
 /* =========================
@@ -590,8 +643,6 @@ function editDrink(dayKey, id) {
 
         return;
     }
-
-    /* TIME OF DAY */
 
     const currentTime =
         drink.timeOfDay || "morning";
@@ -977,18 +1028,39 @@ function freeDays() {
     }
 
     const start =
-        data.commitment;
+        commitmentDate();
 
-    return Object.keys(data.days)
-        .filter(key => {
-            return (
-                key >= start &&
-                Number(
-                    data.days[key].caffeine
-                ) === 0
+    const end =
+        new Date(appDate());
+
+    start.setHours(0, 0, 0, 0);
+    end.setHours(0, 0, 0, 0);
+
+    let total = 0;
+
+    const cursor =
+        new Date(start);
+
+    while (cursor <= end) {
+        const key =
+            dateKey(cursor);
+
+        const caffeine =
+            Number(
+                data.days[key]?.caffeine ||
+                0
             );
-        })
-        .length;
+
+        if (caffeine === 0) {
+            total++;
+        }
+
+        cursor.setDate(
+            cursor.getDate() + 1
+        );
+    }
+
+    return total;
 }
 
 
@@ -1024,10 +1096,13 @@ function caffeineFreeStreak() {
     let streak = 0;
 
     const date =
-        appDate();
+        new Date(appDate());
 
     const start =
         commitmentDate();
+
+    date.setHours(0, 0, 0, 0);
+    start.setHours(0, 0, 0, 0);
 
     while (date >= start) {
         const key =
@@ -1059,26 +1134,33 @@ function bestStreak() {
         return 0;
     }
 
-    const keys =
-        Object.keys(data.days)
-            .filter(
-                key =>
-                    key >=
-                    data.commitment
-            )
-            .sort();
+    const start =
+        commitmentDate();
 
-    let best = 0;
+    const end =
+        new Date(appDate());
+
+    start.setHours(0, 0, 0, 0);
+    end.setHours(0, 0, 0, 0);
+
     let current = 0;
+    let best = 0;
 
-    keys.forEach(key => {
-        if (
+    const cursor =
+        new Date(start);
+
+    while (cursor <= end) {
+        const key =
+            dateKey(cursor);
+
+        const caffeine =
             Number(
-                data.days[key].caffeine
-            ) === 0
-        ) {
-            current++;
+                data.days[key]?.caffeine ||
+                0
+            );
 
+        if (caffeine === 0) {
+            current++;
             best =
                 Math.max(
                     best,
@@ -1089,7 +1171,11 @@ function bestStreak() {
         else {
             current = 0;
         }
-    });
+
+        cursor.setDate(
+            cursor.getDate() + 1
+        );
+    }
 
     return best;
 }
@@ -1140,23 +1226,8 @@ function previousSevenDayTotal() {
 
 
 function weeklyAverage() {
-    let total = 0;
-
-    for (let i = -6; i <= 0; i++) {
-        const key =
-            dateKey(
-                getDay(i)
-            );
-
-        total +=
-            Number(
-                data.days[key]?.caffeine ||
-                0
-            );
-    }
-
     return Math.round(
-        total / 7
+        sevenDayTotal() / 7
     );
 }
 
@@ -1166,6 +1237,16 @@ function weeklyAverage() {
 ========================= */
 
 function renderHistory() {
+    setText(
+        "historyWeekTotal",
+        sevenDayTotal() + " mg"
+    );
+
+    setText(
+        "historyFreeDays",
+        freeDays() + " days"
+    );
+
     const container =
         document.getElementById(
             "historyList"
@@ -1179,220 +1260,215 @@ function renderHistory() {
 
     const keys =
         Object.keys(data.days)
+            .filter(key => {
+                const day =
+                    data.days[key];
+
+                return (
+                    Number(
+                        day.caffeine || 0
+                    ) > 0 ||
+                    (
+                        Array.isArray(
+                            day.entries
+                        ) &&
+                        day.entries.length > 0
+                    )
+                );
+            })
             .sort()
             .reverse();
+
+    if (keys.length === 0) {
+        const empty =
+            document.createElement(
+                "p"
+            );
+
+        empty.className =
+            "page-description";
+
+        empty.textContent =
+            "No caffeine has been logged yet.";
+
+        container.appendChild(empty);
+
+        return;
+    }
 
     keys.forEach(key => {
         const day =
             data.days[key];
 
-        const free =
-            Number(day.caffeine) === 0;
+        const date =
+            new Date(
+                key + "T00:00:00"
+            );
 
-        const card =
+        const row =
             document.createElement(
                 "div"
             );
 
-        card.className =
+        row.className =
             "history-day";
 
-        const left =
-            document.createElement(
-                "div"
+        const dateLabel =
+            date.toLocaleDateString(
+                "en-US",
+                {
+                    weekday: "short",
+                    month: "short",
+                    day: "numeric"
+                }
             );
 
-        left.className =
-            "history-left";
+        row.innerHTML = `
+            <div class="history-left">
 
-        left.innerHTML = `
-            <div class="history-icon">
-                ${free ? "🌱" : "☕"}
+                <div class="history-icon">
+                    ☕
+                </div>
+
+                <div class="history-info">
+
+                    <strong>
+                        ${dateLabel}
+                    </strong>
+
+                    <small>
+                        ${day.drinks || 0}
+                        ${
+                            Number(day.drinks) === 1
+                                ? "drink"
+                                : "drinks"
+                        }
+                    </small>
+
+                </div>
+
             </div>
 
-            <div class="history-info">
+            <div class="history-right">
+
                 <strong>
-                    ${
-                        key ===
-                        dateKey(appDate())
-                            ? "Today"
-                            : formatDate(key)
-                    }
+                    ${Number(day.caffeine || 0)} mg
                 </strong>
 
                 <small>
-                    ${
-                        free
-                            ? "Caffeine-free"
-                            : day.drinks +
-                              " drink" +
-                              (
-                                  day.drinks === 1
-                                      ? ""
-                                      : "s"
-                              )
-                    }
+                    total
                 </small>
+
             </div>
         `;
 
-        const right =
-            document.createElement(
-                "div"
-            );
-
-        right.className =
-            "history-right";
-
-        right.innerHTML = `
-            <strong>
-                ${day.caffeine} mg
-            </strong>
-
-            <small>
-                ${free ? "Great job!" : "logged"}
-            </small>
-        `;
-
-        card.appendChild(left);
-        card.appendChild(right);
-
-        if (day.entries.length) {
-            const drinks =
+        if (
+            Array.isArray(day.entries) &&
+            day.entries.length > 0
+        ) {
+            const drinkList =
                 document.createElement(
                     "div"
                 );
 
-            drinks.className =
+            drinkList.className =
                 "history-drinks";
 
             day.entries.forEach(entry => {
-                const row =
+                const drink =
                     document.createElement(
                         "div"
                     );
 
-                row.className =
+                drink.className =
                     "history-drink";
 
-                const info =
-                    document.createElement(
-                        "div"
-                    );
+                const timeLabels = {
+                    morning:
+                        "☀️ Morning",
 
-                info.innerHTML = `
-    <strong>
-        ${escapeHTML(entry.name)}
-    </strong>
+                    afternoon:
+                        "🌤️ Afternoon",
 
-    <small>
-        ${entry.amount} mg
-        ${
-            entry.timeOfDay
-                ? " • " +
-                  entry.timeOfDay.charAt(0).toUpperCase() +
-                  entry.timeOfDay.slice(1)
-                : ""
-        }
-    </small>
-`;
+                    night:
+                        "🌙 Night"
+                };
 
-                const actions =
-                    document.createElement(
-                        "div"
-                    );
+                const timeLabel =
+                    timeLabels[
+                        entry.timeOfDay
+                    ] || "";
 
-                actions.className =
-                    "history-actions";
+                drink.innerHTML = `
+                    <div>
 
-                const edit =
-                    document.createElement(
-                        "button"
-                    );
+                        <strong>
+                            ${escapeHTML(
+                                entry.name ||
+                                "Caffeine"
+                            )}
+                        </strong>
 
-                edit.className =
-                    "edit-button";
+                        <small>
+                            ${Number(
+                                entry.amount || 0
+                            )} mg
+                            ${
+                                timeLabel
+                                    ? " · " +
+                                      timeLabel
+                                    : ""
+                            }
+                        </small>
 
-                edit.textContent =
-                    "Edit";
+                    </div>
 
-                edit.onclick =
-                    () =>
-                        editDrink(
-                            key,
-                            entry.id
-                        );
+                    <div class="history-actions">
 
-                const remove =
-                    document.createElement(
-                        "button"
-                    );
+                        <button
+                            class="edit-button"
+                            type="button"
+                            onclick="editDrink(
+                                '${key}',
+                                '${String(
+                                    entry.id
+                                )}'
+                            )"
+                        >
+                            Edit
+                        </button>
 
-                remove.className =
-                    "remove-button";
+                        <button
+                            class="remove-button"
+                            type="button"
+                            onclick="removeDrink(
+                                '${key}',
+                                '${String(
+                                    entry.id
+                                )}'
+                            )"
+                            aria-label="Remove drink"
+                        >
+                            ×
+                        </button>
 
-                remove.textContent =
-                    "×";
+                    </div>
+                `;
 
-                remove.title =
-                    "Remove drink";
-
-                remove.onclick =
-                    () =>
-                        removeDrink(
-                            key,
-                            entry.id
-                        );
-
-                actions.appendChild(edit);
-                actions.appendChild(remove);
-
-                row.appendChild(info);
-                row.appendChild(actions);
-
-                drinks.appendChild(row);
+                drinkList.appendChild(
+                    drink
+                );
             });
 
-            card.appendChild(drinks);
+            row.appendChild(
+                drinkList
+            );
         }
 
-        container.appendChild(card);
-    });
-
-    setText(
-        "historyWeekTotal",
-        sevenDayTotal() + " mg"
-    );
-
-    const freeCount =
-        freeDays();
-
-    setText(
-        "historyFreeDays",
-        freeCount +
-        (
-            freeCount === 1
-                ? " day"
-                : " days"
-        )
-    );
-}
-
-
-function formatDate(key) {
-    const date =
-        new Date(
-            key + "T00:00:00"
+        container.appendChild(
+            row
         );
-
-    return date.toLocaleDateString(
-        "en-US",
-        {
-            weekday: "short",
-            month: "short",
-            day: "numeric"
-        }
-    );
+    });
 }
 
 
@@ -1420,17 +1496,40 @@ function renderProgress() {
 
     let change = "—";
 
-    if (previous > 0) {
-        change =
+    if (
+        previous === 0 &&
+        current === 0
+    ) {
+        change = "0%";
+    }
+
+    else if (
+        previous === 0 &&
+        current > 0
+    ) {
+        change = "New";
+    }
+
+    else if (previous > 0) {
+        const difference =
             Math.round(
                 (
                     (
-                        previous -
-                        current
+                        current -
+                        previous
                     ) /
                     previous
                 ) * 100
-            ) + "%";
+            );
+
+        change =
+            difference === 0
+                ? "0%"
+                : (
+                    difference > 0
+                        ? "+" + difference + "%"
+                        : difference + "%"
+                );
     }
 
     setText(
@@ -1707,7 +1806,12 @@ function importData(file) {
                         event.target.result
                     );
 
-                if (!imported.days) {
+                if (
+                    !imported ||
+                    typeof imported !== "object" ||
+                    !imported.days ||
+                    typeof imported.days !== "object"
+                ) {
                     throw new Error(
                         "Invalid data"
                     );
@@ -1727,6 +1831,8 @@ function importData(file) {
 
                 data =
                     imported;
+
+                normalizeData();
 
                 saveData();
 
@@ -1766,7 +1872,29 @@ function resetData() {
         commitment: null
     };
 
+    localStorage.removeItem(
+        "caffTrackName"
+    );
+
     saveData();
+
+    const nameInput =
+        document.getElementById(
+            "nameInput"
+        );
+
+    if (nameInput) {
+        nameInput.value = "";
+    }
+
+    const commitmentName =
+        document.getElementById(
+            "commitmentName"
+        );
+
+    if (commitmentName) {
+        commitmentName.value = "";
+    }
 
     updateApp();
 
@@ -1782,7 +1910,7 @@ function resetData() {
    APPEARANCE
 ========================= */
 
-function changeAppearance(mode) {
+function applyAppearance(mode) {
     document.body.classList.remove(
         "dark-mode"
     );
@@ -1791,25 +1919,31 @@ function changeAppearance(mode) {
         document.body.classList.add(
             "dark-mode"
         );
+
+        return;
     }
 
-    if (mode === "system") {
-        if (
-            window.matchMedia &&
-            window.matchMedia(
-                "(prefers-color-scheme: dark)"
-            ).matches
-        ) {
-            document.body.classList.add(
-                "dark-mode"
-            );
-        }
+    if (
+        mode === "system" &&
+        window.matchMedia &&
+        window.matchMedia(
+            "(prefers-color-scheme: dark)"
+        ).matches
+    ) {
+        document.body.classList.add(
+            "dark-mode"
+        );
     }
+}
 
+
+function changeAppearance(mode) {
     localStorage.setItem(
         "caffTrackAppearance",
         mode
     );
+
+    applyAppearance(mode);
 }
 
 
@@ -1819,7 +1953,7 @@ function loadAppearance() {
             "caffTrackAppearance"
         ) || "system";
 
-    changeAppearance(mode);
+    applyAppearance(mode);
 
     const select =
         document.getElementById(
@@ -1829,6 +1963,34 @@ function loadAppearance() {
     if (select) {
         select.value = mode;
     }
+}
+
+
+function setupSystemAppearanceListener() {
+    if (!window.matchMedia) {
+        return;
+    }
+
+    const media =
+        window.matchMedia(
+            "(prefers-color-scheme: dark)"
+        );
+
+    media.addEventListener(
+        "change",
+        () => {
+            const mode =
+                localStorage.getItem(
+                    "caffTrackAppearance"
+                ) || "system";
+
+            if (mode === "system") {
+                applyAppearance(
+                    "system"
+                );
+            }
+        }
+    );
 }
 
 
@@ -1892,6 +2054,138 @@ function commitWithName() {
 
 
 /* =========================
+   DATA NORMALIZATION
+========================= */
+
+function normalizeData() {
+    if (
+        !data ||
+        typeof data !== "object"
+    ) {
+        data = {
+            days: {},
+            commitment: null
+        };
+    }
+
+    if (
+        !data.days ||
+        typeof data.days !== "object"
+    ) {
+        data.days = {};
+    }
+
+    if (
+        !Object.prototype
+            .hasOwnProperty
+            .call(
+                data,
+                "commitment"
+            )
+    ) {
+        data.commitment = null;
+    }
+
+    Object.keys(data.days)
+        .forEach(key => {
+            const day =
+                data.days[key];
+
+            if (
+                !day ||
+                typeof day !== "object"
+            ) {
+                data.days[key] = {
+                    caffeine: 0,
+                    drinks: 0,
+                    entries: []
+                };
+
+                return;
+            }
+
+            if (
+                !Array.isArray(
+                    day.entries
+                )
+            ) {
+                day.entries = [];
+            }
+
+            day.entries.forEach(
+                entry => {
+                    if (!entry.id) {
+                        entry.id =
+                            Date.now()
+                                .toString() +
+                            Math.random();
+                    }
+
+                    entry.name =
+                        String(
+                            entry.name ||
+                            "Caffeine"
+                        );
+
+                    entry.amount =
+                        Number(
+                            entry.amount ||
+                            0
+                        );
+
+                    if (
+                        ![
+                            "morning",
+                            "afternoon",
+                            "night"
+                        ].includes(
+                            entry.timeOfDay
+                        )
+                    ) {
+                        delete entry.timeOfDay;
+                    }
+                }
+            );
+
+            if (
+                day.entries.length > 0
+            ) {
+                day.caffeine =
+                    day.entries.reduce(
+                        (
+                            total,
+                            entry
+                        ) =>
+                            total +
+                            Number(
+                                entry.amount ||
+                                0
+                            ),
+                        0
+                    );
+
+                day.drinks =
+                    day.entries.length;
+            }
+
+            else {
+                day.caffeine =
+                    Number(
+                        day.caffeine ||
+                        0
+                    );
+
+                day.drinks =
+                    Number(
+                        day.drinks ||
+                        0
+                    );
+            }
+        });
+}
+
+
+/* =========================
    HELPERS
 ========================= */
 
@@ -1920,6 +2214,8 @@ function escapeHTML(value) {
 ========================= */
 
 function updateApp() {
+    normalizeData();
+
     getDayData();
 
     saveData();
@@ -1941,19 +2237,55 @@ function updateApp() {
 
 
 /* =========================
+   APP VERSION / PWA
+========================= */
+
+function registerServiceWorker() {
+    if (
+        "serviceWorker" in navigator &&
+        location.protocol !== "file:"
+    ) {
+        window.addEventListener(
+            "load",
+            () => {
+                navigator.serviceWorker
+                    .register(
+                        "./service-worker.js"
+                    )
+                    .catch(error => {
+                        console.error(
+                            "Service worker registration failed.",
+                            error
+                        );
+                    });
+            }
+        );
+    }
+}
+
+
+/* =========================
    START
 ========================= */
 
 document.addEventListener(
     "DOMContentLoaded",
     () => {
+        normalizeData();
+
         loadAppearance();
 
         loadName();
 
+        setupSystemAppearanceListener();
+
         updateApp();
 
         setupDevMode();
+
+        preparePastDatePicker();
+
+        registerServiceWorker();
 
         if (hasCommitted()) {
             closeCommitment();

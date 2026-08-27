@@ -1,9 +1,10 @@
 {
-    "name": "CaffTrack",
-    "short_name": "CaffTrack",
-    "start_url": "./",
-    "display": "standalone",
-    "background_color": "#f6f8fa",
-    "theme_color": "#3d6f9f",
-    "icons": []
+  "name": "CaffTrack",
+  "short_name": "CaffTrack",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f8fa",
+  "theme_color": "#3d6f9f",
+  "icons": []
 }

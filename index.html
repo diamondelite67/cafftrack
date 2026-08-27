@@ -2,8 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
     <title>CaffTrack</title>
+
+    <meta name="theme-color" content="#3d6f9f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="CaffTrack">
+
+    <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -14,17 +22,11 @@
 
     <div class="commitment-card">
 
-        <div class="commitment-icon">
-            🌱
-        </div>
+        <div class="commitment-icon">🌱</div>
 
-        <p class="eyebrow">
-            WELCOME TO CAFFTRACK
-        </p>
+        <p class="eyebrow">WELCOME TO CAFFTRACK</p>
 
-        <h1>
-            Ready to make a change?
-        </h1>
+        <h1>Ready to make a change?</h1>
 
         <p>
             CaffTrack helps you understand your caffeine use,
@@ -33,25 +35,26 @@
         </p>
 
         <p>
-    When you're ready, make your commitment.
-    Your journey starts today.
-</p>
+            When you're ready, make your commitment.
+            Your journey starts today.
+        </p>
 
-<input
-    id="commitmentName"
-    class="commitment-name-input"
-    type="text"
-    placeholder="What's your name?"
-    maxlength="30"
-    autocomplete="name"
->
+        <input
+            id="commitmentName"
+            class="commitment-name-input"
+            type="text"
+            placeholder="What's your name?"
+            maxlength="30"
+            autocomplete="name"
+        >
 
-<button
-    class="commitment-button"
-    onclick="commitWithName()"
->
-    I'm Ready — Commit
-</button>
+        <button
+            class="commitment-button"
+            type="button"
+            onclick="commitWithName()"
+        >
+            I'm Ready — Commit
+        </button>
 
         <small>
             You can still track caffeine after committing.
@@ -63,12 +66,14 @@
 </div>
 
 
+<!-- APP -->
 <div class="app">
 
     <!-- HOME -->
     <main id="homePage">
 
         <header class="topbar">
+
             <div>
                 <p class="eyebrow">CAFFTRACK</p>
                 <h1 id="greeting">Good morning.</h1>
@@ -78,34 +83,29 @@
                 class="icon-button"
                 type="button"
                 onclick="showPage('settings')"
+                aria-label="Open settings"
             >
                 ⚙️
             </button>
+
         </header>
 
-        <!-- ENCOURAGEMENT -->
+
         <section class="encouragement">
 
-            <div class="encouragement-icon">
-                🌱
-            </div>
+            <div class="encouragement-icon">🌱</div>
 
             <div>
                 <p class="eyebrow">KEEP GOING</p>
-
-                <h2 id="encouragementText">
-                    One day at a time.
-                </h2>
+                <h2 id="encouragementText">One day at a time.</h2>
             </div>
 
         </section>
 
 
-        <!-- TODAY -->
         <section class="section">
 
             <p class="eyebrow">YOUR DASHBOARD</p>
-
             <h2>Overview</h2>
 
             <div class="today-card">
@@ -113,143 +113,82 @@
                 <div class="today-top">
 
                     <div>
-
-                        <p class="card-label">
-                            TODAY
-                        </p>
+                        <p class="card-label">TODAY</p>
 
                         <div class="caffeine-number">
-
-                            <span id="todayCaffeine">
-                                0
-                            </span>
-
-                            <small>
-                                mg
-                            </small>
-
+                            <span id="todayCaffeine">0</span>
+                            <small>mg</small>
                         </div>
-
                     </div>
 
-                    <div class="coffee-icon">
-                        ☕
-                    </div>
+                    <div class="coffee-icon">☕</div>
 
                 </div>
 
-
                 <div class="divider"></div>
-
 
                 <div class="today-stats">
 
                     <div>
-                        <strong id="drinkCount">
-                            0
-                        </strong>
-
-                        <span>
-                            drinks
-                        </span>
+                        <strong id="drinkCount">0</strong>
+                        <span>drinks</span>
                     </div>
 
-
                     <div>
-                        <strong id="streak">
-                            0
-                        </strong>
-
-                        <span>
-                            day streak
-                        </span>
+                        <strong id="streak">0</strong>
+                        <span>day streak</span>
                     </div>
 
                 </div>
 
             </div>
-
 
             <button
                 class="log-button"
                 type="button"
                 onclick="openLogger()"
             >
-
-                <span>
-                    +
-                </span>
-
+                <span>+</span>
                 Log caffeine
-
             </button>
 
         </section>
 
 
-        <!-- WEEKLY -->
         <section class="section">
 
             <div class="section-heading">
 
                 <div>
-
-                    <p class="eyebrow">
-                        LAST 7 DAYS
-                    </p>
-
-                    <h2 id="weeklyTotal">
-                        0 mg
-                    </h2>
-
+                    <p class="eyebrow">LAST 7 DAYS</p>
+                    <h2 id="weeklyTotal">0 mg</h2>
                 </div>
 
-                <span class="muted">
-                    Weekly
-                </span>
+                <span class="muted">Weekly</span>
 
             </div>
 
-
             <div class="card chart-card">
-
-                <div
-                    id="weeklyBars"
-                    class="bars"
-                ></div>
-
+                <div id="weeklyBars" class="bars"></div>
             </div>
 
         </section>
 
 
-        <!-- STATS -->
         <section class="section">
 
-            <p class="eyebrow">
-                INSIGHTS
-            </p>
-
-            <h2>
-                Quick Stats
-            </h2>
-
+            <p class="eyebrow">INSIGHTS</p>
+            <h2>Quick Stats</h2>
 
             <div class="stats-grid">
 
                 <div class="card stat-card">
 
-                    <div class="widget-icon">
-                        🌱
-                    </div>
+                    <div class="widget-icon">🌱</div>
 
-                    <p>
-                        CAFFEINE-FREE DAYS
-                    </p>
+                    <p>CAFFEINE-FREE DAYS</p>
 
-                    <h3 id="freeDays">
-                        0
-                    </h3>
+                    <h3 id="freeDays">0</h3>
 
                     <span
                         id="freeDaysSince"
@@ -263,24 +202,13 @@
 
                 <div class="card stat-card">
 
-                    <div class="widget-icon">
-                        📊
-                    </div>
+                    <div class="widget-icon">📊</div>
 
-                    <p>
-                        THIS WEEK
-                    </p>
+                    <p>THIS WEEK</p>
 
                     <h3>
-
-                        <span id="weeklyTotalStats">
-                            0
-                        </span>
-
-                        <small>
-                            mg
-                        </small>
-
+                        <span id="weeklyTotalStats">0</span>
+                        <small>mg</small>
                     </h3>
 
                     <span class="muted">
@@ -304,13 +232,9 @@
 
         <header class="page-header">
 
-            <p class="eyebrow">
-                YOUR RECORD
-            </p>
+            <p class="eyebrow">YOUR RECORD</p>
 
-            <h1>
-                History
-            </h1>
+            <h1>History</h1>
 
             <p class="page-description">
                 See how your caffeine use has changed over time.
@@ -322,54 +246,64 @@
         <div class="summary-card">
 
             <div>
-
-                <span>
-                    LAST 7 DAYS
-                </span>
-
-                <strong id="historyWeekTotal">
-                    0 mg
-                </strong>
-
+                <span>LAST 7 DAYS</span>
+                <strong id="historyWeekTotal">0 mg</strong>
             </div>
 
-
             <div>
-
-                <span>
-                    CAFFEINE-FREE
-                </span>
-
-                <strong id="historyFreeDays">
-                    0 days
-                </strong>
-
+                <span>CAFFEINE-FREE</span>
+                <strong id="historyFreeDays">0 days</strong>
             </div>
 
         </div>
 
-    <button
-    class="past-log-button"
-    type="button"
-    onclick="openPastDrinkLogger()"
+
+        <div class="past-log-button">
+
+            <span class="past-log-icon">
+                📅
+            </span>
+
+            <span class="past-log-text">
+
+                <strong>
+                    Forgot to log something?
+                </strong>
+
+                <small>
+                    Choose a date below
+                </small>
+
+            </span>
+
+            <div class="past-date-row">
+
+   <input
+    id="pastDrinkDate"
+    class="past-date-picker"
+    type="text"
+    inputmode="numeric"
+    placeholder="MM/DD/YYYY"
+    maxlength="10"
+    oninput="formatPastDate(this)"
 >
-    <span class="past-log-icon">📅</span>
 
-    <span class="past-log-text">
-        <strong>Forgot to log something?</strong>
-        <small>Add it to a previous day</small>
-    </span>
+    <button
+        type="button"
+        class="past-date-button"
+        onclick="pastDateSelected()"
+    >
+        Log
+    </button>
 
-    <span class="past-log-arrow">→</span>
-</button>
+</div>
 
+        </div>
 
 
         <div class="section">
 
-            <h2>
-                Daily history
-            </h2>
+            <h2>Daily history</h2>
 
             <div id="historyList"></div>
 
@@ -386,13 +320,9 @@
 
         <header class="page-header">
 
-            <p class="eyebrow">
-                KEEP GOING
-            </p>
+            <p class="eyebrow">KEEP GOING</p>
 
-            <h1>
-                Progress
-            </h1>
+            <h1>Progress</h1>
 
             <p class="page-description">
                 Your progress is built one day at a time.
@@ -405,9 +335,7 @@
 
             <div class="card progress-card">
 
-                <span>
-                    🔥
-                </span>
+                <span>🔥</span>
 
                 <small>
                     CURRENT STREAK
@@ -417,18 +345,14 @@
                     0
                 </strong>
 
-                <p>
-                    days
-                </p>
+                <p>days</p>
 
             </div>
 
 
             <div class="card progress-card">
 
-                <span>
-                    🏆
-                </span>
+                <span>🏆</span>
 
                 <small>
                     BEST STREAK
@@ -438,18 +362,14 @@
                     0
                 </strong>
 
-                <p>
-                    days
-                </p>
+                <p>days</p>
 
             </div>
 
 
             <div class="card progress-card">
 
-                <span>
-                    🌱
-                </span>
+                <span>🌱</span>
 
                 <small>
                     FREE DAYS
@@ -459,18 +379,14 @@
                     0
                 </strong>
 
-                <p>
-                    total
-                </p>
+                <p>total</p>
 
             </div>
 
 
             <div class="card progress-card">
 
-                <span>
-                    📊
-                </span>
+                <span>📊</span>
 
                 <small>
                     7-DAY AVERAGE
@@ -480,18 +396,14 @@
                     0
                 </strong>
 
-                <p>
-                    mg/day
-                </p>
+                <p>mg/day</p>
 
             </div>
 
 
             <div class="card progress-card">
 
-                <span>
-                    ☕
-                </span>
+                <span>☕</span>
 
                 <small>
                     TOTAL LOGGED
@@ -501,18 +413,14 @@
                     0
                 </strong>
 
-                <p>
-                    mg
-                </p>
+                <p>mg</p>
 
             </div>
 
 
             <div class="card progress-card">
 
-                <span>
-                    📉
-                </span>
+                <span>📉</span>
 
                 <small>
                     WEEKLY CHANGE
@@ -537,9 +445,7 @@
                 MILESTONES
             </p>
 
-            <h2>
-                Keep building
-            </h2>
+            <h2>Keep building</h2>
 
             <div id="milestones"></div>
 
@@ -560,9 +466,7 @@
                 CUSTOMIZE
             </p>
 
-            <h1>
-                Settings
-            </h1>
+            <h1>Settings</h1>
 
             <p class="page-description">
                 Manage your CaffTrack data.
@@ -572,41 +476,62 @@
 
 
         <div class="settings-card">
-            <div class="setting">
-    <div>
-        <strong>Your Name</strong>
-        <small>Personalize your CaffTrack experience.</small>
-    </div>
-
-    <input
-        id="nameInput"
-        type="text"
-        placeholder="Your name"
-        maxlength="30"
-        onchange="saveName(this.value)"
-    >
-</div>
-            
-            <div class="setting">
-    <div>
-        <strong>Appearance</strong>
-        <small>Choose how CaffTrack looks.</small>
-    </div>
-
-    <select
-        id="appearanceSelect"
-        onchange="changeAppearance(this.value)"
-    >
-        <option value="system">System</option>
-        <option value="light">Light</option>
-        <option value="dark">Dark</option>
-    </select>
-</div>
 
             <div class="setting">
 
                 <div>
+                    <strong>Your Name</strong>
 
+                    <small>
+                        Personalize your CaffTrack experience.
+                    </small>
+                </div>
+
+                <input
+                    id="nameInput"
+                    type="text"
+                    placeholder="Your name"
+                    maxlength="30"
+                    onchange="saveName(this.value)"
+                >
+
+            </div>
+
+
+            <div class="setting">
+
+                <div>
+                    <strong>Appearance</strong>
+
+                    <small>
+                        Choose how CaffTrack looks.
+                    </small>
+                </div>
+
+                <select
+                    id="appearanceSelect"
+                    onchange="changeAppearance(this.value)"
+                >
+                    <option value="system">
+                        System
+                    </option>
+
+                    <option value="light">
+                        Light
+                    </option>
+
+                    <option value="dark">
+                        Dark
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="setting">
+
+                <div>
                     <strong>
                         Export data
                     </strong>
@@ -614,7 +539,6 @@
                     <small>
                         Download a backup of your data.
                     </small>
-
                 </div>
 
                 <button
@@ -630,7 +554,6 @@
             <div class="setting">
 
                 <div>
-
                     <strong>
                         Import data
                     </strong>
@@ -638,9 +561,7 @@
                     <small>
                         Restore a previous backup.
                     </small>
-
                 </div>
-
 
                 <label class="button">
 
@@ -660,7 +581,6 @@
             <div class="setting">
 
                 <div>
-
                     <strong>
                         Reset CaffTrack
                     </strong>
@@ -668,7 +588,6 @@
                     <small>
                         Erase all saved data.
                     </small>
-
                 </div>
 
                 <button
@@ -683,13 +602,10 @@
 
         </div>
 
+
         <div class="app-version">
-            CaffTrack · v1.1.0
+            CaffTrack · v1.1.1
         </div>
-
-    </main>
-
-</div>
 
     </main>
 
@@ -704,15 +620,8 @@
         type="button"
         onclick="showPage('home')"
     >
-
-        <span>
-            🏠
-        </span>
-
-        <small>
-            Home
-        </small>
-
+        <span>🏠</span>
+        <small>Home</small>
     </button>
 
 
@@ -721,15 +630,8 @@
         type="button"
         onclick="showPage('history')"
     >
-
-        <span>
-            📅
-        </span>
-
-        <small>
-            History
-        </small>
-
+        <span>📅</span>
+        <small>History</small>
     </button>
 
 
@@ -738,15 +640,8 @@
         type="button"
         onclick="showPage('progress')"
     >
-
-        <span>
-            📈
-        </span>
-
-        <small>
-            Progress
-        </small>
-
+        <span>📈</span>
+        <small>Progress</small>
     </button>
 
 
@@ -755,15 +650,8 @@
         type="button"
         onclick="showPage('settings')"
     >
-
-        <span>
-            ⚙️
-        </span>
-
-        <small>
-            Settings
-        </small>
-
+        <span>⚙️</span>
+        <small>Settings</small>
     </button>
 
 </nav>
@@ -785,61 +673,75 @@
             ×
         </button>
 
+
         <div class="modal-icon">
             ☕
         </div>
+
 
         <p class="eyebrow">
             LOG CAFFEINE
         </p>
 
+
         <h2>
             What did you have?
         </h2>
 
+
         <p class="modal-subtitle">
             Add the drink name and caffeine amount.
         </p>
-        <label class="logger-label">Date</label>
 
-<input
-    id="drinkDate"
-    class="text-input"
-    type="date"
->
 
-<label class="logger-label">Time of day</label>
+        <label class="logger-label">
+            Date
+        </label>
 
-<div class="time-of-day-grid">
+        <input
+            id="drinkDate"
+            class="text-input"
+            type="date"
+        >
 
-    <button
-        type="button"
-        class="time-button"
-        data-time="morning"
-        onclick="selectTimeOfDay('morning')"
-    >
-        ☀️ Morning
-    </button>
 
-    <button
-        type="button"
-        class="time-button"
-        data-time="afternoon"
-        onclick="selectTimeOfDay('afternoon')"
-    >
-        🌤️ Afternoon
-    </button>
+        <label class="logger-label">
+            Time of day
+        </label>
 
-    <button
-        type="button"
-        class="time-button"
-        data-time="night"
-        onclick="selectTimeOfDay('night')"
-    >
-        🌙 Night
-    </button>
 
-</div>
+        <div class="time-of-day-grid">
+
+            <button
+                type="button"
+                class="time-button"
+                data-time="morning"
+                onclick="selectTimeOfDay('morning')"
+            >
+                ☀️ Morning
+            </button>
+
+
+            <button
+                type="button"
+                class="time-button"
+                data-time="afternoon"
+                onclick="selectTimeOfDay('afternoon')"
+            >
+                🌤️ Afternoon
+            </button>
+
+
+            <button
+                type="button"
+                class="time-button"
+                data-time="night"
+                onclick="selectTimeOfDay('night')"
+            >
+                🌙 Night
+            </button>
+
+        </div>
 
 
         <input
@@ -851,51 +753,51 @@
         >
 
 
-<div class="amount-grid">
+        <div class="amount-grid">
 
-    <button
-        type="button"
-        onclick="selectAmount(80)"
-    >
-        80 <small>mg</small>
-    </button>
+            <button
+                type="button"
+                onclick="selectAmount(80)"
+            >
+                80 <small>mg</small>
+            </button>
 
-    <button
-        type="button"
-        onclick="selectAmount(100)"
-    >
-        100 <small>mg</small>
-    </button>
+            <button
+                type="button"
+                onclick="selectAmount(100)"
+            >
+                100 <small>mg</small>
+            </button>
 
-    <button
-        type="button"
-        onclick="selectAmount(150)"
-    >
-        150 <small>mg</small>
-    </button>
+            <button
+                type="button"
+                onclick="selectAmount(150)"
+            >
+                150 <small>mg</small>
+            </button>
 
-    <button
-        type="button"
-        onclick="selectAmount(200)"
-    >
-        200 <small>mg</small>
-    </button>
+            <button
+                type="button"
+                onclick="selectAmount(200)"
+            >
+                200 <small>mg</small>
+            </button>
 
-    <button
-        type="button"
-        onclick="selectAmount(250)"
-    >
-        250 <small>mg</small>
-    </button>
+            <button
+                type="button"
+                onclick="selectAmount(250)"
+            >
+                250 <small>mg</small>
+            </button>
 
-    <button
-        type="button"
-        onclick="selectAmount(300)"
-    >
-        300 <small>mg</small>
-    </button>
+            <button
+                type="button"
+                onclick="selectAmount(300)"
+            >
+                300 <small>mg</small>
+            </button>
 
-</div>
+        </div>
 
 
         <div class="custom-input">
@@ -904,6 +806,7 @@
                 id="customAmount"
                 type="number"
                 min="1"
+                inputmode="numeric"
                 placeholder="Custom mg"
             >
 
@@ -949,12 +852,14 @@
             ← Day
         </button>
 
+
         <button
             type="button"
             onclick="resetDev()"
         >
             Today
         </button>
+
 
         <button
             type="button"
