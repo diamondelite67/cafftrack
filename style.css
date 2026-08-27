@@ -470,41 +470,87 @@ h2 {
 .past-date-row {
     grid-column: 1 / -1;
 
-    display: flex;
-    gap: 8px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
 
     width: 100%;
-    margin-top: 2px;
+    min-width: 0;
+    margin-top: 8px;
 }
 
 .past-date-row .past-date-picker {
-    flex: 1;
-    margin-top: 0;
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+
+    padding: 12px 14px;
+
+    border: 1px solid var(--border);
+    border-radius: 11px;
+
+    background: var(--background);
+    color: var(--text);
+
+    font-family: inherit;
+    font-size: 16px;
+
+    outline: none;
+}
+
+.past-date-row .past-date-picker::placeholder {
+    color: var(--muted);
+    opacity: 0.8;
+}
+
+.past-date-row .past-date-picker:focus {
+    border-color: var(--blue);
 }
 
 .past-date-button {
-    flex-shrink: 0;
+    appearance: none;
+    -webkit-appearance: none;
 
-    padding: 0 16px;
+    min-width: 70px;
+    padding: 12px 16px;
 
+    border: 0;
     border-radius: 11px;
 
     background: var(--blue);
-    color: white;
+    color: #ffffff;
 
-    font-size: 13px;
+    font-family: inherit;
+    font-size: 14px;
     font-weight: 800;
+
+    cursor: pointer;
+}
+
+.past-date-button:active {
+    transform: scale(0.97);
+}
+
+@media (max-width: 400px) {
+    .past-date-row {
+        grid-template-columns: 1fr;
+    }
+
+    .past-date-button {
+        width: 100%;
+    }
 }
 
 .past-log-button {
     display: grid;
-    grid-template-columns: auto 1fr;
+    grid-template-columns: 42px minmax(0, 1fr);
     align-items: center;
     gap: 12px;
 
     width: 100%;
+    min-width: 0;
     margin: 20px 0 24px;
-    padding: 16px 18px;
+    padding: 18px;
 
     background: var(--white);
     border: 1px solid var(--border);
