@@ -1,5 +1,4 @@
 const STORAGE_KEY = "caffTrackData";
-const APP_VERSION = "1.0.0";
 
 let data = loadData();
 let devDate = null;
@@ -10,67 +9,36 @@ let devDate = null;
 ========================= */
 
 function loadData() {
-
     try {
-
-        const saved =
-            localStorage.getItem(STORAGE_KEY);
+        const saved = localStorage.getItem(STORAGE_KEY);
 
         if (saved) {
+            const parsed = JSON.parse(saved);
 
-            const parsed =
-                JSON.parse(saved);
-
-            if (
-                parsed &&
-                parsed.days
-            ) {
-
-                if (
-                    !Object.prototype.hasOwnProperty
-                        .call(
-                            parsed,
-                            "commitment"
-                        )
-                ) {
-
+            if (parsed && parsed.days) {
+                if (!Object.prototype.hasOwnProperty.call(parsed, "commitment")) {
                     parsed.commitment = null;
-
                 }
 
                 return parsed;
-
             }
-
         }
-
+    } catch (error) {
+        console.error("Could not load CaffTrack data.", error);
     }
-
-    catch (error) {
-
-        console.error(
-            "Could not load CaffTrack data.",
-            error
-        );
-
-    }
-
 
     return {
         days: {},
         commitment: null
     };
-
 }
 
 
 function saveData() {
-
     localStorage.setItem(
         STORAGE_KEY,
         JSON.stringify(data)
     );
-
 }
 
 
@@ -79,76 +47,54 @@ function saveData() {
 ========================= */
 
 function appDate() {
-
     return devDate
         ? new Date(devDate)
         : new Date();
-
 }
 
 
 function dateKey(date) {
+    const y = date.getFullYear();
 
-    const y =
-        date.getFullYear();
+    const m = String(
+        date.getMonth() + 1
+    ).padStart(2, "0");
 
-    const m =
-        String(
-            date.getMonth() + 1
-        ).padStart(2, "0");
-
-    const d =
-        String(
-            date.getDate()
-        ).padStart(2, "0");
+    const d = String(
+        date.getDate()
+    ).padStart(2, "0");
 
     return `${y}-${m}-${d}`;
-
 }
 
 
 function getDay(offset = 0) {
-
-    const date =
-        appDate();
+    const date = appDate();
 
     date.setDate(
         date.getDate() + offset
     );
 
     return date;
-
 }
 
 
 function getDayData(
     key = dateKey(appDate())
 ) {
-
     if (!data.days[key]) {
-
         data.days[key] = {
             caffeine: 0,
             drinks: 0,
             entries: []
         };
-
     }
 
-
-    if (
-        !Array.isArray(
-            data.days[key].entries
-        )
-    ) {
-
+    if (!Array.isArray(data.days[key].entries)) {
         data.days[key].entries = [];
-
     }
-
 
     return data.days[key];
-
 }
 
 
@@ -157,128 +103,66 @@ function getDayData(
 ========================= */
 
 function hasCommitted() {
-
     return !!data.commitment;
-
 }
 
 
 function commitmentDate() {
-
     if (!data.commitment) {
         return null;
     }
 
-
     return new Date(
         data.commitment + "T00:00:00"
     );
-
 }
 
 
-/*
-   THIS IS THE IMPORTANT FIX.
-
-   The HTML button calls commitToQuit()
-   directly.
-
-   This function saves the commitment,
-   hides the commitment screen, and
-   opens the home page.
-*/
-
 function commitToQuit() {
-
-    console.log(
-        "CaffTrack commitment button clicked."
-    );
-
-
     if (hasCommitted()) {
-
         closeCommitment();
-
         showPage("home");
-
         return;
-
     }
 
-
-    data.commitment =
-        dateKey(new Date());
-
+    data.commitment = dateKey(new Date());
 
     saveData();
 
-
     closeCommitment();
-
 
     showPage("home");
 
-
     updateApp();
-
 }
 
-
-/*
-   Hide the ORIGINAL commitment screen.
-
-   We are no longer creating a second
-   commitment overlay dynamically.
-*/
 
 function closeCommitment() {
-
     const screen =
         document.getElementById(
             "commitmentScreen"
         );
 
-
     if (screen) {
-
-        screen.classList.add(
-            "hidden"
-        );
-
+        screen.classList.add("hidden");
     }
-
 }
 
 
-/*
-   Show the ORIGINAL commitment screen.
-*/
-
 function showCommitment() {
-
     if (hasCommitted()) {
-
         closeCommitment();
-
         return;
-
     }
-
 
     const screen =
         document.getElementById(
             "commitmentScreen"
         );
 
-
     if (screen) {
-
-        screen.classList.remove(
-            "hidden"
-        );
-
+        screen.classList.remove("hidden");
     }
-
 }
 
 
@@ -287,7 +171,6 @@ function showCommitment() {
 ========================= */
 
 function showPage(page) {
-
     const pages = [
         "homePage",
         "historyPage",
@@ -295,53 +178,32 @@ function showPage(page) {
         "settingsPage"
     ];
 
-
     pages.forEach(id => {
-
         const element =
             document.getElementById(id);
 
-
         if (element) {
-
-            element.classList.add(
-                "hidden"
-            );
-
+            element.classList.add("hidden");
         }
-
     });
-
 
     const selected =
         document.getElementById(
             page + "Page"
         );
 
-
     if (selected) {
-
-        selected.classList.remove(
-            "hidden"
-        );
-
+        selected.classList.remove("hidden");
     }
-
 
     const nav =
         document.querySelectorAll(
             ".nav-item"
         );
 
-
     nav.forEach(item => {
-
-        item.classList.remove(
-            "active"
-        );
-
+        item.classList.remove("active");
     });
-
 
     const index = {
         home: 0,
@@ -350,29 +212,17 @@ function showPage(page) {
         settings: 3
     }[page];
 
-
     if (nav[index]) {
-
-        nav[index].classList.add(
-            "active"
-        );
-
+        nav[index].classList.add("active");
     }
-
 
     if (page === "history") {
-
         renderHistory();
-
     }
-
 
     if (page === "progress") {
-
         renderProgress();
-
     }
-
 }
 
 
@@ -386,65 +236,117 @@ function openLogger() {
         .getElementById("logger")
         .classList.add("active");
 
+    const dateInput =
+        document.getElementById("drinkDate");
+
+    if (dateInput) {
+
+        dateInput.value =
+            dateKey(appDate());
+
+        dateInput.max =
+            dateKey(new Date());
+
+    }
+
+    selectTimeOfDay(
+        getSuggestedTimeOfDay()
+    );
 
     setTimeout(() => {
 
         const input =
-            document.getElementById(
-                "drinkName"
-            );
-
+            document.getElementById("drinkName");
 
         if (input) {
-
             input.focus();
-
         }
 
     }, 100);
 
 }
+function getSuggestedTimeOfDay() {
+
+    const hour =
+        appDate().getHours();
+
+    if (hour < 12) {
+        return "morning";
+    }
+
+    if (hour < 18) {
+        return "afternoon";
+    }
+
+    return "night";
+
+}
+
+
+function selectTimeOfDay(time) {
+
+    document
+        .querySelectorAll(".time-button")
+        .forEach(button => {
+
+            button.classList.toggle(
+                "selected",
+                button.dataset.time === time
+            );
+
+        });
+
+}
+
+
+function getSelectedTimeOfDay() {
+
+    const selected =
+        document.querySelector(
+            ".time-button.selected"
+        );
+
+    return selected
+        ? selected.dataset.time
+        : getSuggestedTimeOfDay();
+
+}
 
 
 function closeLogger() {
-
     document
         .getElementById("logger")
         .classList.remove("active");
-
 }
 
 
 function addCaffeine(amount) {
 
-    amount =
-        Number(amount);
+    amount = Number(amount);
 
-
-    if (
-        !amount ||
-        amount <= 0
-    ) {
-
+    if (!amount || amount <= 0) {
         return;
-
     }
 
-
     const nameInput =
-        document.getElementById(
-            "drinkName"
-        );
-
+        document.getElementById("drinkName");
 
     const name =
         nameInput.value.trim() ||
         "Caffeine";
 
+    const dateInput =
+        document.getElementById("drinkDate");
+
+    const selectedDate =
+        dateInput.value ||
+        dateKey(appDate());
+
+    const timeOfDay =
+        getSelectedTimeOfDay();
 
     const day =
-        getDayData();
-
+        getDayData(selectedDate);
 
     day.entries.push({
 
@@ -456,45 +358,43 @@ function addCaffeine(amount) {
             name,
 
         amount:
-            amount
+            amount,
+
+        timeOfDay:
+            timeOfDay
 
     });
 
-
     day.caffeine += amount;
-
 
     day.drinks =
         day.entries.length;
 
-
     saveData();
-
 
     closeLogger();
 
+    nameInput.value = "";
 
     document
-        .getElementById(
-            "drinkName"
-        )
+        .getElementById("customAmount")
         .value = "";
-
-
-    document
-        .getElementById(
-            "customAmount"
-        )
-        .value = "";
-
 
     updateApp();
 
 }
 
+function selectAmount(amount) {
+    const customInput =
+        document.getElementById("customAmount");
+
+    if (customInput) {
+        customInput.value = amount;
+        customInput.focus();
+    }
+}
 
 function addCustom() {
-
     const amount =
         Number(
             document
@@ -504,36 +404,136 @@ function addCustom() {
                 .value
         );
 
+    if (!amount || amount <= 0) {
+        alert("Please enter a valid caffeine amount.");
+        return;
+    }
 
     addCaffeine(amount);
-
 }
 
 
 /* =========================
-   REMOVE DRINK
+   PAST-DATE LOGGING
 ========================= */
 
-function removeDrink(
-    dayKey,
-    id
-) {
+/*
+   This is the ONLY button needed
+   for adding caffeine to a previous day.
 
+   It opens the device's native
+   calendar/date picker.
+*/
+
+function openPastDrinkLogger() {
+    const input =
+        document.createElement("input");
+
+    input.type = "date";
+
+    input.max =
+        dateKey(new Date());
+
+    input.style.position = "fixed";
+    input.style.left = "-9999px";
+    input.style.opacity = "0";
+
+    document.body.appendChild(input);
+
+    input.addEventListener(
+        "change",
+        () => {
+            const selectedDate =
+                input.value;
+
+            input.remove();
+
+            if (!selectedDate) {
+                return;
+            }
+
+            addDrinkToPastDay(
+                selectedDate
+            );
+        }
+    );
+
+    input.showPicker
+        ? input.showPicker()
+        : input.click();
+}
+
+
+function addDrinkToPastDay(dayKey) {
+    const name =
+        prompt("What drink did you have?");
+
+    if (
+        name === null ||
+        !name.trim()
+    ) {
+        return;
+    }
+
+    const amount =
+        Number(
+            prompt(
+                "How much caffeine did it contain? (mg)"
+            )
+        );
+
+    if (
+        !amount ||
+        amount <= 0
+    ) {
+        alert(
+            "Please enter a valid caffeine amount."
+        );
+
+        return;
+    }
+
+    const day =
+        getDayData(dayKey);
+
+    day.entries.push({
+        id:
+            Date.now().toString() +
+            Math.random(),
+
+        name:
+            name.trim(),
+
+        amount:
+            amount
+    });
+
+    day.caffeine += amount;
+
+    day.drinks =
+        day.entries.length;
+
+    saveData();
+
+    updateApp();
+
+    renderHistory();
+}
+
+/* =========================
+   EDIT DRINK
+========================= */
+
+function editDrink(dayKey, id) {
     const day =
         data.days[dayKey];
 
-
     if (
         !day ||
-        !Array.isArray(
-            day.entries
-        )
+        !Array.isArray(day.entries)
     ) {
-
         return;
-
     }
-
 
     const drink =
         day.entries.find(
@@ -542,24 +542,141 @@ function removeDrink(
                 String(id)
         );
 
-
     if (!drink) {
-
         return;
-
     }
 
+    const newName =
+        prompt(
+            "Drink name:",
+            drink.name
+        );
+
+    if (newName === null) {
+        return;
+    }
+
+    const cleanName =
+        newName.trim();
+
+    if (!cleanName) {
+        alert(
+            "Please enter a drink name."
+        );
+
+        return;
+    }
+
+    const newAmount =
+        prompt(
+            "Caffeine amount (mg):",
+            drink.amount
+        );
+
+    if (newAmount === null) {
+        return;
+    }
+
+    const amount =
+        Number(newAmount);
+
+    if (
+        !amount ||
+        amount <= 0
+    ) {
+        alert(
+            "Please enter a valid caffeine amount."
+        );
+
+        return;
+    }
+
+    /* TIME OF DAY */
+
+    const currentTime =
+        drink.timeOfDay || "morning";
+
+    const newTime =
+        prompt(
+            "Time of day (morning, afternoon, or night):",
+            currentTime
+        );
+
+    if (newTime === null) {
+        return;
+    }
+
+    const cleanTime =
+        newTime.trim().toLowerCase();
+
+    if (
+        ![
+            "morning",
+            "afternoon",
+            "night"
+        ].includes(cleanTime)
+    ) {
+        alert(
+            "Please enter morning, afternoon, or night."
+        );
+
+        return;
+    }
+
+    drink.name = cleanName;
+    drink.amount = amount;
+    drink.timeOfDay = cleanTime;
+
+    day.caffeine =
+        day.entries.reduce(
+            (total, entry) =>
+                total +
+                Number(entry.amount || 0),
+            0
+        );
+
+    day.drinks =
+        day.entries.length;
+
+    saveData();
+
+    updateApp();
+}
+
+
+/* =========================
+   REMOVE DRINK
+========================= */
+
+function removeDrink(dayKey, id) {
+    const day =
+        data.days[dayKey];
+
+    if (
+        !day ||
+        !Array.isArray(day.entries)
+    ) {
+        return;
+    }
+
+    const drink =
+        day.entries.find(
+            entry =>
+                String(entry.id) ===
+                String(id)
+        );
+
+    if (!drink) {
+        return;
+    }
 
     if (
         !confirm(
             `Remove "${drink.name}" (${drink.amount} mg)?`
         )
     ) {
-
         return;
-
     }
-
 
     day.entries =
         day.entries.filter(
@@ -568,13 +685,9 @@ function removeDrink(
                 String(id)
         );
 
-
     day.caffeine =
         day.entries.reduce(
-            (
-                total,
-                entry
-            ) =>
+            (total, entry) =>
                 total +
                 Number(
                     entry.amount || 0
@@ -582,19 +695,14 @@ function removeDrink(
             0
         );
 
-
     day.drinks =
         day.entries.length;
 
-
     saveData();
-
 
     updateApp();
 
-
     renderHistory();
-
 }
 
 
@@ -603,56 +711,46 @@ function removeDrink(
 ========================= */
 
 function updateHome() {
-
     const today =
         getDayData();
 
-
     const total =
         sevenDayTotal();
-
 
     setText(
         "todayCaffeine",
         today.caffeine
     );
 
-
     setText(
         "drinkCount",
         today.drinks
     );
-
 
     setText(
         "streak",
         caffeineFreeStreak()
     );
 
-
     setText(
         "weeklyTotal",
         total + " mg"
     );
-
 
     setText(
         "weeklyTotalStats",
         total
     );
 
-
     setText(
         "freeDays",
         freeDays()
     );
 
-
     setText(
         "freeDaysSince",
         freeDaysSince()
     );
-
 }
 
 
@@ -661,48 +759,41 @@ function updateHome() {
 ========================= */
 
 function updateGreeting() {
-
     const hour =
         appDate().getHours();
 
-
-    let text;
-
+    let greeting;
 
     if (hour < 12) {
-
-        text =
-            "Good morning.";
-
+        greeting = "Good morning";
     }
 
     else if (hour < 17) {
-
-        text =
-            "Good afternoon.";
-
+        greeting = "Good afternoon";
     }
 
     else if (hour < 21) {
-
-        text =
-            "Good evening.";
-
+        greeting = "Good evening";
     }
 
     else {
-
-        text =
-            "Good night.";
-
+        greeting = "Good night";
     }
 
+    const name =
+        localStorage.getItem(
+            "caffTrackName"
+        ) || "";
+
+    const text =
+        name
+            ? `${greeting}, ${name}.`
+            : `${greeting}.`;
 
     setText(
         "greeting",
         text
     );
-
 }
 
 
@@ -711,80 +802,58 @@ function updateGreeting() {
 ========================= */
 
 function updateEncouragement() {
-
     const today =
         getDayData();
-
 
     const streak =
         caffeineFreeStreak();
 
-
     let message;
 
-
     if (streak >= 30) {
-
         message =
             "🏆 Thirty days. You've built something seriously strong.";
-
     }
 
     else if (streak >= 14) {
-
         message =
             "🔥 Two weeks caffeine-free. That's a huge milestone.";
-
     }
 
     else if (streak >= 7) {
-
         message =
             "🔥 Seven days. You've built a real habit.";
-
     }
 
     else if (streak >= 3) {
-
         message =
             "🌱 Three days. You're building momentum.";
-
     }
 
     else if (streak === 2) {
-
         message =
             "🔥 Two days down. Keep going.";
-
     }
 
     else if (streak === 1) {
-
         message =
             "🌱 Day one. One day at a time.";
-
     }
 
     else if (today.caffeine === 0) {
-
         message =
             "💙 No caffeine today. That's a win.";
-
     }
 
     else {
-
         message =
             "🌱 Keep tracking. Progress doesn't require perfection.";
-
     }
-
 
     setText(
         "encouragementText",
         message
     );
-
 }
 
 
@@ -793,97 +862,70 @@ function updateEncouragement() {
 ========================= */
 
 function renderChart() {
-
     const container =
         document.getElementById(
             "weeklyBars"
         );
 
-
     if (!container) {
-
         return;
-
     }
-
 
     container.innerHTML = "";
 
-
     const days = [];
 
-
-    for (
-        let i = -6;
-        i <= 0;
-        i++
-    ) {
-
+    for (let i = -6; i <= 0; i++) {
         const date =
             getDay(i);
-
 
         const key =
             dateKey(date);
 
-
         const value =
             data.days[key]?.caffeine ||
             0;
-
 
         days.push({
             date,
             key,
             value
         });
-
     }
-
 
     const max =
         Math.max(
             400,
             ...days.map(
-                day =>
-                    day.value
+                day => day.value
             )
         );
 
-
     days.forEach(day => {
-
         const column =
             document.createElement(
                 "div"
             );
 
-
         column.className =
             "bar-column";
-
 
         const bar =
             document.createElement(
                 "div"
             );
 
-
         bar.className =
             "bar";
-
 
         if (
             day.key ===
             dateKey(appDate())
         ) {
-
             bar.classList.add(
                 "today-bar"
             );
-
         }
-
 
         const height =
             day.value === 0
@@ -896,20 +938,16 @@ function renderChart() {
                     ) * 75
                 );
 
-
         bar.style.height =
             height + "px";
 
-
         bar.title =
             day.value + " mg";
-
 
         const label =
             document.createElement(
                 "span"
             );
-
 
         label.textContent =
             day.date
@@ -921,15 +959,11 @@ function renderChart() {
                 )
                 .charAt(0);
 
-
         column.appendChild(bar);
-
         column.appendChild(label);
 
         container.appendChild(column);
-
     });
-
 }
 
 
@@ -938,46 +972,33 @@ function renderChart() {
 ========================= */
 
 function freeDays() {
-
     if (!hasCommitted()) {
-
         return 0;
-
     }
-
 
     const start =
         data.commitment;
 
-
     return Object.keys(data.days)
         .filter(key => {
-
             return (
                 key >= start &&
                 Number(
                     data.days[key].caffeine
                 ) === 0
             );
-
         })
         .length;
-
 }
 
 
 function freeDaysSince() {
-
     if (!hasCommitted()) {
-
         return "Not started";
-
     }
-
 
     const date =
         commitmentDate();
-
 
     return "Since " +
         date.toLocaleDateString(
@@ -988,7 +1009,6 @@ function freeDaysSince() {
                 year: "numeric"
             }
         );
-
 }
 
 
@@ -997,72 +1017,47 @@ function freeDaysSince() {
 ========================= */
 
 function caffeineFreeStreak() {
-
     if (!hasCommitted()) {
-
         return 0;
-
     }
 
-
     let streak = 0;
-
 
     const date =
         appDate();
 
-
     const start =
         commitmentDate();
 
-
-    while (
-        date >= start
-    ) {
-
+    while (date >= start) {
         const key =
             dateKey(date);
-
 
         const day =
             data.days[key];
 
-
         if (
             day &&
-            Number(
-                day.caffeine
-            ) > 0
+            Number(day.caffeine) > 0
         ) {
-
             break;
-
         }
 
-
         streak++;
-
 
         date.setDate(
             date.getDate() - 1
         );
-
     }
 
-
     return streak;
-
 }
 
 
 function bestStreak() {
-
     if (!hasCommitted()) {
-
         return 0;
-
     }
-
 
     const keys =
         Object.keys(data.days)
@@ -1073,20 +1068,15 @@ function bestStreak() {
             )
             .sort();
 
-
     let best = 0;
-
     let current = 0;
 
-
     keys.forEach(key => {
-
         if (
             Number(
                 data.days[key].caffeine
             ) === 0
         ) {
-
             current++;
 
             best =
@@ -1094,20 +1084,14 @@ function bestStreak() {
                     best,
                     current
                 );
-
         }
 
         else {
-
             current = 0;
-
         }
-
     });
 
-
     return best;
-
 }
 
 
@@ -1116,97 +1100,64 @@ function bestStreak() {
 ========================= */
 
 function sevenDayTotal() {
-
     let total = 0;
 
-
-    for (
-        let i = -6;
-        i <= 0;
-        i++
-    ) {
-
+    for (let i = -6; i <= 0; i++) {
         const key =
             dateKey(
                 getDay(i)
             );
-
 
         total +=
             Number(
                 data.days[key]?.caffeine ||
                 0
             );
-
     }
 
-
     return total;
-
 }
 
 
 function previousSevenDayTotal() {
-
     let total = 0;
 
-
-    for (
-        let i = -13;
-        i <= -7;
-        i++
-    ) {
-
+    for (let i = -13; i <= -7; i++) {
         const key =
             dateKey(
                 getDay(i)
             );
-
 
         total +=
             Number(
                 data.days[key]?.caffeine ||
                 0
             );
-
     }
 
-
     return total;
-
 }
 
 
 function weeklyAverage() {
-
     let total = 0;
 
-
-    for (
-        let i = -6;
-        i <= 0;
-        i++
-    ) {
-
+    for (let i = -6; i <= 0; i++) {
         const key =
             dateKey(
                 getDay(i)
             );
-
 
         total +=
             Number(
                 data.days[key]?.caffeine ||
                 0
             );
-
     }
-
 
     return Math.round(
         total / 7
     );
-
 }
 
 
@@ -1215,69 +1166,51 @@ function weeklyAverage() {
 ========================= */
 
 function renderHistory() {
-
     const container =
         document.getElementById(
             "historyList"
         );
 
-
     if (!container) {
-
         return;
-
     }
 
-
     container.innerHTML = "";
-
 
     const keys =
         Object.keys(data.days)
             .sort()
             .reverse();
 
-
     keys.forEach(key => {
-
         const day =
             data.days[key];
 
-
         const free =
-            Number(
-                day.caffeine
-            ) === 0;
-
+            Number(day.caffeine) === 0;
 
         const card =
             document.createElement(
                 "div"
             );
 
-
         card.className =
             "history-day";
-
 
         const left =
             document.createElement(
                 "div"
             );
 
-
         left.className =
             "history-left";
 
-
         left.innerHTML = `
-
             <div class="history-icon">
                 ${free ? "🌱" : "☕"}
             </div>
 
             <div class="history-info">
-
                 <strong>
                     ${
                         key ===
@@ -1300,24 +1233,18 @@ function renderHistory() {
                               )
                     }
                 </small>
-
             </div>
-
         `;
-
 
         const right =
             document.createElement(
                 "div"
             );
 
-
         right.className =
             "history-right";
 
-
         right.innerHTML = `
-
             <strong>
                 ${day.caffeine} mg
             </strong>
@@ -1325,139 +1252,138 @@ function renderHistory() {
             <small>
                 ${free ? "Great job!" : "logged"}
             </small>
-
         `;
 
-
         card.appendChild(left);
-
         card.appendChild(right);
 
-
-        if (
-            day.entries.length
-        ) {
-
+        if (day.entries.length) {
             const drinks =
                 document.createElement(
                     "div"
                 );
 
-
             drinks.className =
                 "history-drinks";
 
+            day.entries.forEach(entry => {
+                const row =
+                    document.createElement(
+                        "div"
+                    );
 
-            day.entries.forEach(
-                entry => {
+                row.className =
+                    "history-drink";
 
-                    const row =
-                        document.createElement(
-                            "div"
+                const info =
+                    document.createElement(
+                        "div"
+                    );
+
+                info.innerHTML = `
+    <strong>
+        ${escapeHTML(entry.name)}
+    </strong>
+
+    <small>
+        ${entry.amount} mg
+        ${
+            entry.timeOfDay
+                ? " • " +
+                  entry.timeOfDay.charAt(0).toUpperCase() +
+                  entry.timeOfDay.slice(1)
+                : ""
+        }
+    </small>
+`;
+
+                const actions =
+                    document.createElement(
+                        "div"
+                    );
+
+                actions.className =
+                    "history-actions";
+
+                const edit =
+                    document.createElement(
+                        "button"
+                    );
+
+                edit.className =
+                    "edit-button";
+
+                edit.textContent =
+                    "Edit";
+
+                edit.onclick =
+                    () =>
+                        editDrink(
+                            key,
+                            entry.id
                         );
 
+                const remove =
+                    document.createElement(
+                        "button"
+                    );
 
-                    row.className =
-                        "history-drink";
+                remove.className =
+                    "remove-button";
 
+                remove.textContent =
+                    "×";
 
-                    const info =
-                        document.createElement(
-                            "div"
+                remove.title =
+                    "Remove drink";
+
+                remove.onclick =
+                    () =>
+                        removeDrink(
+                            key,
+                            entry.id
                         );
 
+                actions.appendChild(edit);
+                actions.appendChild(remove);
 
-                    info.innerHTML = `
+                row.appendChild(info);
+                row.appendChild(actions);
 
-                        <strong>
-                            ${escapeHTML(
-                                entry.name
-                            )}
-                        </strong>
-
-                        <small>
-                            ${entry.amount} mg
-                        </small>
-
-                    `;
-
-
-                    const remove =
-                        document.createElement(
-                            "button"
-                        );
-
-
-                    remove.className =
-                        "remove-button";
-
-
-                    remove.textContent =
-                        "×";
-
-
-                    remove.title =
-                        "Remove drink";
-
-
-                    remove.type =
-                        "button";
-
-
-                    remove.onclick =
-                        () =>
-                            removeDrink(
-                                key,
-                                entry.id
-                            );
-
-
-                    row.appendChild(info);
-
-                    row.appendChild(remove);
-
-                    drinks.appendChild(row);
-
-                }
-            );
-
+                drinks.appendChild(row);
+            });
 
             card.appendChild(drinks);
-
         }
 
-
         container.appendChild(card);
-
     });
-
 
     setText(
         "historyWeekTotal",
         sevenDayTotal() + " mg"
     );
 
+    const freeCount =
+        freeDays();
 
     setText(
         "historyFreeDays",
-        freeDays() +
+        freeCount +
         (
-            freeDays() === 1
+            freeCount === 1
                 ? " day"
                 : " days"
         )
     );
-
 }
 
 
 function formatDate(key) {
-
     const date =
         new Date(
             key + "T00:00:00"
         );
-
 
     return date.toLocaleDateString(
         "en-US",
@@ -1467,7 +1393,6 @@ function formatDate(key) {
             day: "numeric"
         }
     );
-
 }
 
 
@@ -1476,14 +1401,10 @@ function formatDate(key) {
 ========================= */
 
 function renderProgress() {
-
     const totalLogged =
         Object.values(data.days)
             .reduce(
-                (
-                    total,
-                    day
-                ) =>
+                (total, day) =>
                     total +
                     Number(
                         day.caffeine || 0
@@ -1491,20 +1412,15 @@ function renderProgress() {
                 0
             );
 
-
     const previous =
         previousSevenDayTotal();
-
 
     const current =
         sevenDayTotal();
 
-
     let change = "—";
 
-
     if (previous > 0) {
-
         change =
             Math.round(
                 (
@@ -1515,48 +1431,39 @@ function renderProgress() {
                     previous
                 ) * 100
             ) + "%";
-
     }
-
 
     setText(
         "progressStreak",
         caffeineFreeStreak()
     );
 
-
     setText(
         "bestStreak",
         bestStreak()
     );
-
 
     setText(
         "progressFreeDays",
         freeDays()
     );
 
-
     setText(
         "weeklyAverage",
         weeklyAverage()
     );
-
 
     setText(
         "totalLogged",
         totalLogged
     );
 
-
     setText(
         "weeklyChange",
         change
     );
 
-
     renderMilestones();
-
 }
 
 
@@ -1565,146 +1472,96 @@ function renderProgress() {
 ========================= */
 
 function renderMilestones() {
-
     const container =
         document.getElementById(
             "milestones"
         );
 
-
     if (!container) {
-
         return;
-
     }
-
 
     container.innerHTML = "";
 
-
     const milestones = [
-
-        [
-            1,
-            "First caffeine-free day"
-        ],
-
-        [
-            2,
-            "2 caffeine-free days"
-        ],
-
-        [
-            3,
-            "3 caffeine-free days"
-        ],
-
-        [
-            7,
-            "7 caffeine-free days"
-        ],
-
-        [
-            14,
-            "14 caffeine-free days"
-        ],
-
-        [
-            30,
-            "30 caffeine-free days"
-        ]
-
+        [1, "First caffeine-free day"],
+        [2, "2 caffeine-free days"],
+        [3, "3 caffeine-free days"],
+        [7, "7 caffeine-free days"],
+        [14, "14 caffeine-free days"],
+        [30, "30 caffeine-free days"]
     ];
 
+    milestones.forEach(item => {
+        const complete =
+            freeDays() >= item[0];
 
-    milestones.forEach(
-        item => {
+        const row =
+            document.createElement(
+                "div"
+            );
 
-            const complete =
-                freeDays() >=
-                item[0];
+        row.className =
+            "milestone" +
+            (
+                complete
+                    ? " complete"
+                    : ""
+            );
 
-
-            const row =
-                document.createElement(
-                    "div"
-                );
-
-
-            row.className =
-                "milestone" +
-                (
+        row.innerHTML = `
+            <div class="milestone-check">
+                ${
                     complete
-                        ? " complete"
-                        : ""
-                );
+                        ? "✓"
+                        : item[0]
+                }
+            </div>
 
+            <div>
+                <strong>
+                    ${item[1]}
+                </strong>
 
-            row.innerHTML = `
-
-                <div class="milestone-check">
+                <small>
                     ${
                         complete
-                            ? "✓"
-                            : item[0]
+                            ? "Completed"
+                            : "Keep going"
                     }
-                </div>
+                </small>
+            </div>
+        `;
 
-                <div>
-
-                    <strong>
-                        ${item[1]}
-                    </strong>
-
-                    <small>
-                        ${
-                            complete
-                                ? "Completed"
-                                : "Keep going"
-                        }
-                    </small>
-
-                </div>
-
-            `;
-
-
-            container.appendChild(row);
-
-        }
-    );
-
+        container.appendChild(row);
+    });
 }
 
-
-/* =========================
-   DEV MODE
-========================= */
 
 /* =========================
    DEV MODE
 ========================= */
 
 function isLocalVersion() {
-
     return (
         location.hostname === "localhost" ||
         location.hostname === "127.0.0.1"
     );
-
 }
 
 
 function setupDevMode() {
-
     const devButton =
-        document.getElementById("devButton");
+        document.getElementById(
+            "devButton"
+        );
 
     const devPanel =
-        document.getElementById("devPanel");
+        document.getElementById(
+            "devPanel"
+        );
 
     if (!isLocalVersion()) {
-
         if (devButton) {
             devButton.remove();
         }
@@ -1717,18 +1574,18 @@ function setupDevMode() {
     }
 
     updateDev();
-
 }
 
 
 function toggleDev() {
-
     if (!isLocalVersion()) {
         return;
     }
 
     const panel =
-        document.getElementById("devPanel");
+        document.getElementById(
+            "devPanel"
+        );
 
     if (!panel) {
         return;
@@ -1740,12 +1597,10 @@ function toggleDev() {
             : "block";
 
     updateDev();
-
 }
 
 
 function changeDevDay(amount) {
-
     if (!isLocalVersion()) {
         return;
     }
@@ -1760,12 +1615,10 @@ function changeDevDay(amount) {
     devDate = date;
 
     updateApp();
-
 }
 
 
 function resetDev() {
-
     if (!isLocalVersion()) {
         return;
     }
@@ -1773,14 +1626,14 @@ function resetDev() {
     devDate = null;
 
     updateApp();
-
 }
 
 
 function updateDev() {
-
     const date =
-        document.getElementById("devDate");
+        document.getElementById(
+            "devDate"
+        );
 
     if (!date) {
         return;
@@ -1796,15 +1649,14 @@ function updateDev() {
                 year: "numeric"
             }
         );
-
 }
+
 
 /* =========================
    SETTINGS
 ========================= */
 
 function exportData() {
-
     const blob =
         new Blob(
             [
@@ -1820,69 +1672,46 @@ function exportData() {
             }
         );
 
-
     const url =
         URL.createObjectURL(blob);
-
 
     const link =
         document.createElement(
             "a"
         );
 
-
-    link.href =
-        url;
-
+    link.href = url;
 
     link.download =
         "cafftrack-backup.json";
 
-
     link.click();
 
-
-    URL.revokeObjectURL(
-        url
-    );
-
+    URL.revokeObjectURL(url);
 }
 
 
 function importData(file) {
-
     if (!file) {
-
         return;
-
     }
-
 
     const reader =
         new FileReader();
 
-
     reader.onload =
         event => {
-
             try {
-
                 const imported =
                     JSON.parse(
                         event.target.result
                     );
 
-
-                if (
-                    !imported.days
-                ) {
-
+                if (!imported.days) {
                     throw new Error(
                         "Invalid data"
                     );
-
                 }
-
 
                 if (
                     !Object.prototype
@@ -1892,86 +1721,173 @@ function importData(file) {
                             "commitment"
                         )
                 ) {
-
                     imported.commitment =
                         null;
-
                 }
-
 
                 data =
                     imported;
 
-
                 saveData();
-
 
                 updateApp();
 
-
-                if (
-                    !hasCommitted()
-                ) {
-
+                if (!hasCommitted()) {
                     showCommitment();
-
                 }
-
 
                 alert(
                     "CaffTrack data restored."
                 );
-
             }
 
             catch {
-
                 alert(
                     "That file could not be imported."
                 );
-
             }
-
         };
 
-
     reader.readAsText(file);
-
 }
 
 
 function resetData() {
-
     if (
         !confirm(
             "Are you sure you want to erase all CaffTrack data?"
         )
     ) {
-
         return;
-
     }
-
 
     data = {
         days: {},
         commitment: null
     };
 
-
     saveData();
-
 
     updateApp();
 
-
     showCommitment();
-
 
     alert(
         "CaffTrack has been reset."
     );
+}
 
+
+/* =========================
+   APPEARANCE
+========================= */
+
+function changeAppearance(mode) {
+    document.body.classList.remove(
+        "dark-mode"
+    );
+
+    if (mode === "dark") {
+        document.body.classList.add(
+            "dark-mode"
+        );
+    }
+
+    if (mode === "system") {
+        if (
+            window.matchMedia &&
+            window.matchMedia(
+                "(prefers-color-scheme: dark)"
+            ).matches
+        ) {
+            document.body.classList.add(
+                "dark-mode"
+            );
+        }
+    }
+
+    localStorage.setItem(
+        "caffTrackAppearance",
+        mode
+    );
+}
+
+
+function loadAppearance() {
+    const mode =
+        localStorage.getItem(
+            "caffTrackAppearance"
+        ) || "system";
+
+    changeAppearance(mode);
+
+    const select =
+        document.getElementById(
+            "appearanceSelect"
+        );
+
+    if (select) {
+        select.value = mode;
+    }
+}
+
+
+/* =========================
+   PERSONALIZATION
+========================= */
+
+function saveName(name) {
+    name = name.trim();
+
+    localStorage.setItem(
+        "caffTrackName",
+        name
+    );
+
+    updateGreeting();
+}
+
+
+function loadName() {
+    const name =
+        localStorage.getItem(
+            "caffTrackName"
+        ) || "";
+
+    const input =
+        document.getElementById(
+            "nameInput"
+        );
+
+    if (input) {
+        input.value = name;
+    }
+
+    updateGreeting();
+}
+
+
+function commitWithName() {
+    const input =
+        document.getElementById(
+            "commitmentName"
+        );
+
+    const name =
+        input.value.trim();
+
+    if (!name) {
+        input.focus();
+
+        input.placeholder =
+            "Please enter your name";
+
+        return;
+    }
+
+    saveName(name);
+
+    commitToQuit();
 }
 
 
@@ -1979,56 +1895,23 @@ function resetData() {
    HELPERS
 ========================= */
 
-function setText(
-    id,
-    value
-) {
-
+function setText(id, value) {
     const element =
-        document.getElementById(
-            id
-        );
-
+        document.getElementById(id);
 
     if (element) {
-
-        element.textContent =
-            value;
-
+        element.textContent = value;
     }
-
 }
 
 
 function escapeHTML(value) {
-
     return String(value)
-
-        .replaceAll(
-            "&",
-            "&amp;"
-        )
-
-        .replaceAll(
-            "<",
-            "&lt;"
-        )
-
-        .replaceAll(
-            ">",
-            "&gt;"
-        )
-
-        .replaceAll(
-            '"',
-            "&quot;"
-        )
-
-        .replaceAll(
-            "'",
-            "&#039;"
-        );
-
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
 }
 
 
@@ -2037,7 +1920,6 @@ function escapeHTML(value) {
 ========================= */
 
 function updateApp() {
-
     getDayData();
 
     saveData();
@@ -2055,12 +1937,6 @@ function updateApp() {
     renderProgress();
 
     updateDev();
-
-    setText(
-        "appVersion",
-        APP_VERSION
-    );
-
 }
 
 
@@ -2071,49 +1947,20 @@ function updateApp() {
 document.addEventListener(
     "DOMContentLoaded",
     () => {
+        loadAppearance();
+
+        loadName();
 
         updateApp();
-
-
-        /*
-           If the user has already committed,
-           don't show the commitment screen.
-        */
-
-        if (
-            hasCommitted()
-        ) {
-
-            closeCommitment();
-
-        }
-
-        else {
-
-            showCommitment();
-
-        }
-
-    }
-);
-
-
-/* =========================
-   ESCAPE CLOSES LOGGER
-========================= */
-
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
 
         setupDevMode();
 
-        updateApp();
+        if (hasCommitted()) {
+            closeCommitment();
+        }
 
-        setTimeout(
-            showCommitment,
-            100
-        );
-
+        else {
+            showCommitment();
+        }
     }
 );

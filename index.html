@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CaffTrack</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#3d6f9f">
 </head>
 
 <body>
@@ -35,18 +33,25 @@
         </p>
 
         <p>
-            When you're ready, make your commitment.
-            Your journey starts today.
-        </p>
+    When you're ready, make your commitment.
+    Your journey starts today.
+</p>
 
-        <button
-            id="commitButton"
-            class="commitment-button"
-            type="button"
-            onclick="commitToQuit()"
-        >
-            I'm Ready — Commit
-        </button>
+<input
+    id="commitmentName"
+    class="commitment-name-input"
+    type="text"
+    placeholder="What's your name?"
+    maxlength="30"
+    autocomplete="name"
+>
+
+<button
+    class="commitment-button"
+    onclick="commitWithName()"
+>
+    I'm Ready — Commit
+</button>
 
         <small>
             You can still track caffeine after committing.
@@ -343,6 +348,22 @@
 
         </div>
 
+    <button
+    class="past-log-button"
+    type="button"
+    onclick="openPastDrinkLogger()"
+>
+    <span class="past-log-icon">📅</span>
+
+    <span class="past-log-text">
+        <strong>Forgot to log something?</strong>
+        <small>Add it to a previous day</small>
+    </span>
+
+    <span class="past-log-arrow">→</span>
+</button>
+
+
 
         <div class="section">
 
@@ -550,60 +571,126 @@
         </header>
 
 
-       <div class="settings-card">
-
-    <div class="setting">
-        <div>
-            <strong>Export data</strong>
-            <small>Download a backup of your data.</small>
-        </div>
-
-        <button onclick="exportData()">Export</button>
-    </div>
-
-    <div class="setting">
-        <div>
-            <strong>Import data</strong>
-            <small>Restore a previous backup.</small>
-        </div>
-
-        <label class="button">
-            Import
-            <input
-                type="file"
-                accept=".json"
-                onchange="importData(this.files[0]); this.value='';"
-            >
-        </label>
-    </div>
-
-    <div class="setting">
-        <div>
-            <strong>Reset CaffTrack</strong>
-            <small>Erase all saved data.</small>
-        </div>
-
-        <button class="danger" onclick="resetData()">Reset</button>
-    </div>
-
-</div>
-
-<!-- APP VERSION -->
-<div class="app-version">
-
-    <div class="version-icon">
-        🌱
-    </div>
-
+        <div class="settings-card">
+            <div class="setting">
     <div>
-        <strong>CaffTrack</strong>
-
-        <small>
-            Version <span id="appVersion">1.0.0</span>
-        </small>
+        <strong>Your Name</strong>
+        <small>Personalize your CaffTrack experience.</small>
     </div>
 
+    <input
+        id="nameInput"
+        type="text"
+        placeholder="Your name"
+        maxlength="30"
+        onchange="saveName(this.value)"
+    >
 </div>
+            
+            <div class="setting">
+    <div>
+        <strong>Appearance</strong>
+        <small>Choose how CaffTrack looks.</small>
+    </div>
+
+    <select
+        id="appearanceSelect"
+        onchange="changeAppearance(this.value)"
+    >
+        <option value="system">System</option>
+        <option value="light">Light</option>
+        <option value="dark">Dark</option>
+    </select>
+</div>
+
+            <div class="setting">
+
+                <div>
+
+                    <strong>
+                        Export data
+                    </strong>
+
+                    <small>
+                        Download a backup of your data.
+                    </small>
+
+                </div>
+
+                <button
+                    type="button"
+                    onclick="exportData()"
+                >
+                    Export
+                </button>
+
+            </div>
+
+
+            <div class="setting">
+
+                <div>
+
+                    <strong>
+                        Import data
+                    </strong>
+
+                    <small>
+                        Restore a previous backup.
+                    </small>
+
+                </div>
+
+
+                <label class="button">
+
+                    Import
+
+                    <input
+                        type="file"
+                        accept=".json"
+                        onchange="importData(this.files[0]); this.value='';"
+                    >
+
+                </label>
+
+            </div>
+
+
+            <div class="setting">
+
+                <div>
+
+                    <strong>
+                        Reset CaffTrack
+                    </strong>
+
+                    <small>
+                        Erase all saved data.
+                    </small>
+
+                </div>
+
+                <button
+                    class="danger"
+                    type="button"
+                    onclick="resetData()"
+                >
+                    Reset
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="app-version">
+            CaffTrack · v1.1.0
+        </div>
+
+    </main>
+
+</div>
+
     </main>
 
 </div>
@@ -713,6 +800,46 @@
         <p class="modal-subtitle">
             Add the drink name and caffeine amount.
         </p>
+        <label class="logger-label">Date</label>
+
+<input
+    id="drinkDate"
+    class="text-input"
+    type="date"
+>
+
+<label class="logger-label">Time of day</label>
+
+<div class="time-of-day-grid">
+
+    <button
+        type="button"
+        class="time-button"
+        data-time="morning"
+        onclick="selectTimeOfDay('morning')"
+    >
+        ☀️ Morning
+    </button>
+
+    <button
+        type="button"
+        class="time-button"
+        data-time="afternoon"
+        onclick="selectTimeOfDay('afternoon')"
+    >
+        🌤️ Afternoon
+    </button>
+
+    <button
+        type="button"
+        class="time-button"
+        data-time="night"
+        onclick="selectTimeOfDay('night')"
+    >
+        🌙 Night
+    </button>
+
+</div>
 
 
         <input
@@ -724,51 +851,51 @@
         >
 
 
-        <div class="amount-grid">
+<div class="amount-grid">
 
-            <button
-                type="button"
-                onclick="addCaffeine(80)"
-            >
-                80 <small>mg</small>
-            </button>
+    <button
+        type="button"
+        onclick="selectAmount(80)"
+    >
+        80 <small>mg</small>
+    </button>
 
-            <button
-                type="button"
-                onclick="addCaffeine(100)"
-            >
-                100 <small>mg</small>
-            </button>
+    <button
+        type="button"
+        onclick="selectAmount(100)"
+    >
+        100 <small>mg</small>
+    </button>
 
-            <button
-                type="button"
-                onclick="addCaffeine(150)"
-            >
-                150 <small>mg</small>
-            </button>
+    <button
+        type="button"
+        onclick="selectAmount(150)"
+    >
+        150 <small>mg</small>
+    </button>
 
-            <button
-                type="button"
-                onclick="addCaffeine(200)"
-            >
-                200 <small>mg</small>
-            </button>
+    <button
+        type="button"
+        onclick="selectAmount(200)"
+    >
+        200 <small>mg</small>
+    </button>
 
-            <button
-                type="button"
-                onclick="addCaffeine(250)"
-            >
-                250 <small>mg</small>
-            </button>
+    <button
+        type="button"
+        onclick="selectAmount(250)"
+    >
+        250 <small>mg</small>
+    </button>
 
-            <button
-                type="button"
-                onclick="addCaffeine(300)"
-            >
-                300 <small>mg</small>
-            </button>
+    <button
+        type="button"
+        onclick="selectAmount(300)"
+    >
+        300 <small>mg</small>
+    </button>
 
-        </div>
+</div>
 
 
         <div class="custom-input">
@@ -842,24 +969,6 @@
 
 
 <script src="script.js"></script>
-    <script>
-
-if ("serviceWorker" in navigator) {
-
-    window.addEventListener(
-        "load",
-        () => {
-
-            navigator.serviceWorker.register(
-                "./service-worker.js"
-            );
-
-        }
-    );
-
-}
-
-</script>
 
 </body>
 </html>
