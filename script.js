@@ -1,5 +1,5 @@
 const STORAGE_KEY = "caffTrackData";
-const APP_VERSION = "1.2.0";
+const APP_VERSION = "1.2.1";
 const MAX_CAFFEINE_PER_DRINK = 999;
 
 let data = loadData();
@@ -2946,6 +2946,90 @@ function logSavedDrink(id) {
    DRINK PICKER
 ========================= */
 
+function addHistoryDrinksToMyDrinks() {
+    const drinks = getMyDrinks();
+
+    const existingNames =
+        new Set(
+            drinks.map(drink =>
+                normalizeDrinkName(drink.name)
+            )
+        );
+
+    const historyDrinks = new Map();
+
+    Object.entries(data.days || {})
+        .sort(([a], [b]) => b.localeCompare(a))
+        .forEach(([dayKey, day]) => {
+            if (!Array.isArray(day.entries)) {
+                return;
+            }
+
+            [...day.entries]
+                .reverse()
+                .forEach(entry => {
+                    const name =
+                        String(entry.name || "").trim();
+
+                    const normalized =
+                        normalizeDrinkName(name);
+
+                    const amount =
+                        Number(entry.amount);
+
+                    if (
+                        !normalized ||
+                        historyDrinks.has(normalized) ||
+                        !Number.isInteger(amount) ||
+                        amount < 1 ||
+                        amount > MAX_CAFFEINE_PER_DRINK
+                    ) {
+                        return;
+                    }
+
+                    historyDrinks.set(
+                        normalized,
+                        {
+                            name,
+                            amount
+                        }
+                    );
+                });
+        });
+
+    let added = false;
+
+    historyDrinks.forEach(
+        (drink, normalized) => {
+            if (existingNames.has(normalized)) {
+                return;
+            }
+
+            drinks.push({
+                id:
+                    Date.now().toString() +
+                    Math.random(),
+
+                name:
+                    drink.name,
+
+                amount:
+                    drink.amount,
+
+                createdAt:
+                    Date.now()
+            });
+
+            existingNames.add(normalized);
+            added = true;
+        }
+    );
+
+    if (added) {
+        saveData();
+    }
+}
+
 function normalizeDrinkName(name) {
     return String(name || "")
         .trim()
@@ -3381,6 +3465,8 @@ document.addEventListener(
     "DOMContentLoaded",
     () => {
         normalizeData();
+
+        addHistoryDrinksToMyDrinks();
 
         loadAppearance();
 

@@ -1,4 +1,4 @@
-const CACHE_NAME = "cafftrack-v1.2.0";
+const CACHE_NAME = "cafftrack-v1";
 
 const FILES_TO_CACHE = [
     "./",
