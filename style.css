@@ -1397,6 +1397,80 @@ body.dark-mode .past-date-picker {
     color: var(--danger);
 }
 
+/* MERGE DRINK */
+
+.merge-drink-select {
+    width: 100%;
+
+    margin-bottom: 16px;
+    padding: 13px;
+
+    border: 1px solid var(--border);
+    border-radius: 12px;
+
+    background: var(--white);
+    color: var(--text);
+
+    font: inherit;
+    font-size: 13px;
+
+    outline: none;
+    cursor: pointer;
+}
+
+.merge-drink-select:focus {
+    border-color: var(--blue);
+}
+
+.merge-amount-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+
+    margin-bottom: 18px;
+    padding: 14px;
+
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+
+    cursor: pointer;
+}
+
+.merge-amount-option input {
+    width: 18px;
+    height: 18px;
+
+    flex-shrink: 0;
+
+    margin: 1px 0 0;
+
+    accent-color: var(--blue);
+}
+
+.merge-amount-option span {
+    min-width: 0;
+}
+
+.merge-amount-option strong {
+    display: block;
+
+    color: var(--text);
+
+    font-size: 13px;
+}
+
+.merge-amount-option small {
+    display: block;
+
+    margin-top: 4px;
+
+    color: var(--muted);
+
+    font-size: 11px;
+    line-height: 1.4;
+}
+
 /* ADD TO MY DRINKS */
 
 .saved-drink-modal {

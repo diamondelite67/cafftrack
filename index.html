@@ -695,7 +695,7 @@
 
 
         <div class="app-version">
-            CaffTrack · v1.2.1
+            CaffTrack · v1.2.2
         </div>
 
     </main>
@@ -1191,6 +1191,76 @@
     </div>
 </div>
 
+<!-- MERGE DRINK MODAL -->
+<div
+    id="mergeDrinkModal"
+    class="overlay"
+>
+    <div class="modal saved-drink-modal">
+
+        <button
+            class="close-button"
+            type="button"
+            onclick="closeMergeDrink()"
+        >
+            ×
+        </button>
+
+        <p class="eyebrow">
+            MY DRINKS
+        </p>
+
+        <h2>Merge drink</h2>
+
+        <p class="modal-subtitle">
+            Merge
+            <strong id="mergeSourceDrinkName"></strong>
+            into another saved drink.
+        </p>
+
+        <label
+            class="logger-label"
+            for="mergeTargetDrink"
+        >
+            Merge into
+        </label>
+
+        <select
+            id="mergeTargetDrink"
+            class="merge-drink-select"
+        >
+        </select>
+
+        <label class="merge-amount-option">
+
+            <input
+                id="mergeKeepAmounts"
+                type="checkbox"
+                checked
+            >
+
+            <span>
+                <strong>Keep original caffeine amounts</strong>
+
+                <small>
+                    History entries keep the caffeine amounts
+                    originally logged.
+                </small>
+            </span>
+
+        </label>
+
+        <button
+            class="save-drink-button"
+            type="button"
+            onclick="confirmMergeDrink()"
+        >
+            Merge Drinks
+        </button>
+
+    </div>
+</div>
+
 <!-- DEVELOPER -->
 <button
     id="devButton"
@@ -1244,3 +1314,4 @@
 
 </body>
 </html>
+

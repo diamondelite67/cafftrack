@@ -1,5 +1,5 @@
 const STORAGE_KEY = "caffTrackData";
-const APP_VERSION = "1.2.1";
+const APP_VERSION = "1.2.2";
 const MAX_CAFFEINE_PER_DRINK = 999;
 
 let data = loadData();
@@ -2713,19 +2713,26 @@ function renderMyDrinks() {
                                 >
 
                                     <button
-                                        type="button"
-                                        onclick="openEditSavedDrink('${drink.id}')"
-                                    >
-                                        Edit Drink
-                                    </button>
+    type="button"
+    onclick="openEditSavedDrink('${drink.id}')"
+>
+    Edit Drink
+</button>
 
-                                    <button
-                                        class="danger"
-                                        type="button"
-                                        onclick="removeSavedDrink('${drink.id}')"
-                                    >
-                                        Remove from My Drinks
-                                    </button>
+<button
+    type="button"
+    onclick="openMergeDrink('${drink.id}')"
+>
+    Merge Drink
+</button>
+
+<button
+    class="danger"
+    type="button"
+    onclick="removeSavedDrink('${drink.id}')"
+>
+    Remove from My Drinks
+</button>
 
                                 </div>
 
@@ -2801,6 +2808,200 @@ function removeSavedDrink(id) {
     saveData();
 
     renderMyDrinks();
+}
+
+let mergeSourceDrinkId = null;
+
+
+function openMergeDrink(id) {
+    const source =
+        getMyDrinks().find(drink =>
+            String(drink.id) === String(id)
+        );
+
+    if (!source) {
+        return;
+    }
+
+    const otherDrinks =
+        getMyDrinks().filter(drink =>
+            String(drink.id) !== String(id)
+        );
+
+    if (!otherDrinks.length) {
+        alert(
+            "You need at least two drinks in My Drinks to merge."
+        );
+
+        return;
+    }
+
+    mergeSourceDrinkId = id;
+
+    closeMyDrinkMenus();
+
+    const sourceName =
+        document.getElementById(
+            "mergeSourceDrinkName"
+        );
+
+    const targetSelect =
+        document.getElementById(
+            "mergeTargetDrink"
+        );
+
+    const amountChoice =
+        document.getElementById(
+            "mergeKeepAmounts"
+        );
+
+    if (sourceName) {
+        sourceName.textContent =
+            source.name;
+    }
+
+    if (targetSelect) {
+        targetSelect.innerHTML =
+            otherDrinks
+                .sort((a, b) =>
+                    a.name.localeCompare(b.name)
+                )
+                .map(drink => `
+                    <option value="${escapeHTML(drink.id)}">
+                        ${escapeHTML(drink.name)}
+                        — ${Number(drink.amount)} mg
+                    </option>
+                `)
+                .join("");
+    }
+
+    if (amountChoice) {
+        amountChoice.checked = true;
+    }
+
+    const modal =
+        document.getElementById(
+            "mergeDrinkModal"
+        );
+
+    if (modal) {
+        modal.classList.add("active");
+    }
+}
+
+
+function closeMergeDrink() {
+    const modal =
+        document.getElementById(
+            "mergeDrinkModal"
+        );
+
+    if (modal) {
+        modal.classList.remove("active");
+    }
+
+    mergeSourceDrinkId = null;
+}
+
+
+function confirmMergeDrink() {
+    const source =
+        getMyDrinks().find(drink =>
+            String(drink.id) ===
+            String(mergeSourceDrinkId)
+        );
+
+    const targetSelect =
+        document.getElementById(
+            "mergeTargetDrink"
+        );
+
+    if (!source || !targetSelect) {
+        return;
+    }
+
+    const target =
+        getMyDrinks().find(drink =>
+            String(drink.id) ===
+            String(targetSelect.value)
+        );
+
+    if (!target) {
+        return;
+    }
+
+    const keepAmounts =
+        document.getElementById(
+            "mergeKeepAmounts"
+        )?.checked ?? true;
+
+    const sourceName =
+        normalizeDrinkName(source.name);
+
+    let changedEntries = 0;
+
+    Object.values(data.days || {})
+        .forEach(day => {
+            if (!Array.isArray(day.entries)) {
+                return;
+            }
+
+            let dayChanged = false;
+
+            day.entries.forEach(entry => {
+                if (
+                    normalizeDrinkName(entry.name) ===
+                    sourceName
+                ) {
+                    entry.name =
+                        target.name;
+
+                    if (!keepAmounts) {
+                        entry.amount =
+                            Number(target.amount);
+                    }
+
+                    changedEntries++;
+                    dayChanged = true;
+                }
+            });
+
+            if (dayChanged) {
+                day.caffeine =
+                    day.entries.reduce(
+                        (total, entry) =>
+                            total +
+                            Number(entry.amount || 0),
+                        0
+                    );
+
+                day.drinks =
+                    day.entries.length;
+            }
+        });
+
+    data.myDrinks =
+        getMyDrinks().filter(drink =>
+            String(drink.id) !==
+            String(source.id)
+        );
+
+    saveData();
+
+    closeMergeDrink();
+
+    updateApp();
+
+    renderMyDrinks();
+
+    alert(
+        `"${source.name}" was merged into "${target.name}".\n\n` +
+        `${changedEntries} History ${
+            changedEntries === 1
+                ? "entry was"
+                : "entries were"
+        } updated.`
+    );
 }
 
 function openEditSavedDrink(id) {
