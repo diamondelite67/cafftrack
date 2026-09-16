@@ -943,6 +943,514 @@ body.dark-mode .past-date-picker {
     font-weight: 800;
 }
 
+/* RESET MODAL */
+
+.reset-modal {
+    padding-bottom: 22px;
+}
+
+.reset-drinks-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    margin: 20px 0;
+
+    padding: 14px;
+
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+
+    cursor: pointer;
+
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.reset-drinks-option input {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+
+    accent-color: var(--danger);
+}
+
+.reset-modal-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.reset-cancel-button,
+.reset-confirm-button {
+    width: 100%;
+
+    padding: 13px 10px;
+
+    border-radius: 12px;
+
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.reset-cancel-button {
+    background: var(--blue-light);
+    color: var(--blue);
+}
+
+.reset-confirm-button {
+    background: var(--danger);
+    color: white;
+}
+
+/* DRINK PICKER */
+
+.drink-picker {
+    position: relative;
+    margin-bottom: 12px;
+}
+
+.drink-picker .drink-name-input {
+    margin-bottom: 0;
+}
+
+.drink-suggestions {
+    position: absolute;
+
+    top: calc(100% + 5px);
+    left: 0;
+    right: 0;
+
+    overflow: hidden;
+
+    max-height: 260px;
+    overflow-y: auto;
+
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 13px;
+
+    box-shadow:
+        0 12px 30px rgba(20, 35, 45, 0.16);
+
+    z-index: 20;
+}
+
+.drink-suggestions-heading {
+    padding: 10px 12px 6px;
+
+    color: var(--muted);
+
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .8px;
+}
+
+.drink-suggestion {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    padding: 11px 12px;
+
+    text-align: left;
+
+    background: transparent;
+    color: var(--text);
+}
+
+.drink-suggestion:active {
+    background: var(--blue-light);
+}
+
+.drink-suggestion span {
+    min-width: 0;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.drink-suggestion strong {
+    flex-shrink: 0;
+
+    color: var(--blue);
+
+    font-size: 11px;
+}
+
+.view-my-drinks {
+    width: 100%;
+
+    padding: 11px 12px;
+
+    border-top: 1px solid var(--border);
+
+    text-align: left;
+
+    background: transparent;
+    color: var(--blue);
+
+    font-size: 11px;
+    font-weight: 800;
+}
+
+/* SAVE TO MY DRINKS */
+
+.save-to-my-drinks {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    margin: 14px 0;
+}
+
+.save-to-my-drinks.hidden {
+    display: none !important;
+}
+
+.save-to-my-drinks label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    margin: 0;
+
+    cursor: pointer;
+
+    color: var(--text);
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.save-to-my-drinks input {
+    width: 17px;
+    height: 17px;
+
+    margin: 0;
+
+    accent-color: var(--blue);
+}
+
+/* =========================
+   MY DRINKS
+   ========================= */
+
+.my-drinks-toolbar {
+    display: grid;
+    grid-template-columns: 1fr 46px;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.my-drinks-search {
+    width: 100%;
+    height: 46px;
+    padding: 0 14px;
+
+    border: 1px solid var(--border);
+    border-radius: 13px;
+
+    background: var(--white);
+    color: var(--text);
+
+    outline: none;
+}
+
+.my-drinks-search:focus {
+    border-color: var(--blue);
+}
+
+.my-drinks-add-button {
+    width: 46px;
+    height: 46px;
+
+    border-radius: 13px;
+
+    background: var(--blue);
+    color: white;
+
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.my-drinks-sort {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 7px;
+
+    margin-bottom: 20px;
+    padding: 4px;
+
+    border-radius: 13px;
+    background: var(--blue-light);
+}
+
+.my-drinks-sort-button {
+    padding: 9px 5px;
+
+    border-radius: 10px;
+
+    background: transparent;
+    color: var(--muted);
+
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.my-drinks-sort-button.active {
+    background: var(--white);
+    color: var(--blue);
+
+    box-shadow: 0 2px 7px rgba(30, 65, 95, 0.08);
+}
+
+.my-drink-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    margin-bottom: 9px;
+    padding: 14px;
+
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 15px;
+}
+
+.my-drink-bolt {
+    position: relative;
+
+    width: 38px;
+    height: 38px;
+
+    flex-shrink: 0;
+
+    border-radius: 11px;
+    background: rgba(255, 214, 10, 0.14);
+}
+
+.my-drink-bolt::before {
+    content: "";
+
+    position: absolute;
+    inset: 9px;
+
+    background: #FFD60A;
+
+    -webkit-mask: url("images/caffeine.png") center / contain no-repeat;
+    mask: url("images/caffeine.png") center / contain no-repeat;
+}
+
+.my-drink-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.my-drink-info strong {
+    display: block;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    font-size: 14px;
+}
+
+.my-drink-info span {
+    display: block;
+
+    margin-top: 3px;
+
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.my-drink-log-button {
+    flex-shrink: 0;
+
+    padding: 9px 12px;
+
+    border-radius: 10px;
+
+    background: var(--blue-light);
+    color: var(--blue);
+
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.my-drinks-empty {
+    padding: 45px 20px;
+
+    text-align: center;
+    color: var(--muted);
+}
+
+.my-drinks-empty strong {
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: var(--text);
+    font-size: 16px;
+}
+
+.my-drinks-empty p {
+    margin: 0;
+
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.my-drink-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    flex-shrink: 0;
+}
+
+.my-drink-menu-wrap {
+    position: relative;
+}
+
+.my-drink-menu-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 34px;
+    height: 34px;
+
+    padding: 0;
+
+    border-radius: 10px;
+
+    background: transparent;
+    color: var(--muted);
+
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.my-drink-menu-button:active {
+    background: var(--blue-light);
+}
+
+.my-drink-menu {
+    position: absolute;
+
+    top: calc(100% + 5px);
+    right: 0;
+
+    width: 190px;
+
+    overflow: hidden;
+
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+
+    box-shadow:
+        0 10px 30px rgba(20, 35, 45, 0.16);
+
+    z-index: 30;
+}
+
+.my-drink-menu button {
+    display: block;
+
+    width: 100%;
+
+    padding: 12px;
+
+    text-align: left;
+
+    background: transparent;
+    color: var(--text);
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.my-drink-menu button + button {
+    border-top: 1px solid var(--border);
+}
+
+.my-drink-menu button:active {
+    background: var(--blue-light);
+}
+
+.my-drink-menu button.danger {
+    color: var(--danger);
+}
+
+/* ADD TO MY DRINKS */
+
+.saved-drink-modal {
+    padding-bottom: 24px;
+}
+
+.saved-drink-amount {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    margin-bottom: 16px;
+}
+
+.saved-drink-amount input {
+    width: 100%;
+    min-width: 0;
+
+    padding: 13px;
+
+    border: 1px solid var(--border);
+    border-radius: 12px;
+
+    background: var(--white);
+    color: var(--text);
+
+    outline: none;
+}
+
+.saved-drink-amount input:focus {
+    border-color: var(--blue);
+}
+
+.saved-drink-amount span {
+    flex-shrink: 0;
+
+    color: var(--muted);
+
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.save-drink-button {
+    width: 100%;
+
+    padding: 14px;
+
+    border-radius: 13px;
+
+    background: var(--blue);
+    color: white;
+
+    font-weight: 800;
+}
 
 /* BOTTOM NAV */
 
@@ -955,7 +1463,7 @@ body.dark-mode .past-date-picker {
     width: min(100%, 520px);
 
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
 
     padding: 9px 10px calc(9px + env(safe-area-inset-bottom));
 
@@ -991,6 +1499,85 @@ body.dark-mode .past-date-picker {
     color: var(--blue);
 }
 
+/* =========================
+   NAV ICONS
+   ========================= */
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.nav-item .nav-icon {
+    display: block;
+    position: relative;
+
+    width: 38px;
+    height: 32px;
+
+    margin: 0 auto;
+    padding: 0;
+
+    border-radius: 10px;
+
+    font-size: 0;
+    line-height: 0;
+
+    transition:
+        background-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.nav-item .nav-icon::before {
+    content: "";
+
+    position: absolute;
+
+    width: 21px;
+    height: 21px;
+
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+
+    margin: 0;
+    padding: 0;
+
+    background-color: var(--muted);
+
+    -webkit-mask-image: var(--icon);
+    mask-image: var(--icon);
+
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+
+    -webkit-mask-position: center;
+    mask-position: center;
+
+    -webkit-mask-size: contain;
+    mask-size: contain;
+}
+
+.nav-item.active .nav-icon {
+    background: rgba(61, 111, 159, 0.12);
+}
+
+.nav-item.active .nav-icon::before {
+    background-color: var(--blue);
+}
+
+.nav-item small {
+    display: block;
+    margin: 0;
+    padding: 0;
+
+    text-align: center;
+    line-height: 1;
+}
 
 /* DEV */
 
@@ -1269,4 +1856,32 @@ body.dark-mode .commitment-card small {
     #nameInput {
         width: 115px;
     }
+}
+
+.header-icon {
+    display: block;
+
+    width: 21px;
+    height: 21px;
+
+    margin: auto;
+
+    background-color: var(--text);
+
+    -webkit-mask: var(--icon) center / contain no-repeat;
+    mask: var(--icon) center / contain no-repeat;
+}
+
+.caffeine-icon {
+    display: block;
+
+    width: 28px;
+    height: 28px;
+
+    background-color: #FFD60A;
+
+    -webkit-mask: var(--icon) center / contain no-repeat;
+    mask: var(--icon) center / contain no-repeat;
+
+    filter: drop-shadow(0 0 5px rgba(255, 214, 10, 0.25));
 }

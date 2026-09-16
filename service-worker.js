@@ -1,11 +1,19 @@
-const CACHE_NAME = "cafftrack-v1.1.2";
+const CACHE_NAME = "cafftrack-v1.2.0";
 
 const FILES_TO_CACHE = [
     "./",
     "./index.html",
     "./style.css",
     "./script.js",
-    "./manifest.json"
+    "./manifest.json",
+
+    "./images/caffeine.png",
+    "./images/home.png",
+    "./images/history.png",
+    "./images/mydrinks.png",
+    "./images/progress.png",
+    "./images/settings.png",
+    "./images/stats.png"
 ];
 
 

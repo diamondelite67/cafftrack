@@ -12,7 +12,7 @@
     <meta name="apple-mobile-web-app-title" content="CaffTrack">
 
     <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="style.css?v=1.1.2">
+    <link rel="stylesheet" href="style.css?v=1.2.0">
 </head>
 
 <body>
@@ -79,14 +79,17 @@
                 <h1 id="greeting">Good morning.</h1>
             </div>
 
-            <button
-                class="icon-button"
-                type="button"
-                onclick="showPage('settings')"
-                aria-label="Open settings"
-            >
-                ⚙️
-            </button>
+           <button
+    class="icon-button"
+    type="button"
+    onclick="showPage('settings')"
+    aria-label="Open settings"
+>
+    <span
+        class="header-icon"
+        style="--icon: url('images/settings.png');"
+    ></span>
+</button>
 
         </header>
 
@@ -121,7 +124,12 @@
                         </div>
                     </div>
 
-                    <div class="coffee-icon">☕</div>
+                    <div class="coffee-icon">
+    <span
+        class="caffeine-icon"
+        style="--icon: url('images/caffeine.png');"
+    ></span>
+</div>
 
                 </div>
 
@@ -453,6 +461,89 @@
 
     </main>
 
+        <!-- MY DRINKS -->
+    <main
+        id="drinksPage"
+        class="hidden"
+    >
+
+        <header class="page-header">
+
+            <p class="eyebrow">YOUR LIBRARY</p>
+
+            <h1>My Drinks</h1>
+
+            <p class="page-description">
+                Save your usual drinks for faster logging.
+            </p>
+
+        </header>
+
+
+        <div class="my-drinks-toolbar">
+
+            <div class="my-drinks-search-wrap">
+
+                <input
+                    id="myDrinksSearch"
+                    class="my-drinks-search"
+                    type="text"
+                    placeholder="Search My Drinks"
+                    autocomplete="off"
+                    oninput="renderMyDrinks()"
+                >
+
+            </div>
+
+            <button
+                class="my-drinks-add-button"
+                type="button"
+                onclick="openNewSavedDrink()"
+            >
+                +
+            </button>
+
+        </div>
+
+
+        <div class="my-drinks-sort">
+
+            <button
+                class="my-drinks-sort-button active"
+                type="button"
+                data-sort="recent"
+                onclick="setMyDrinksSort('recent')"
+            >
+                Recent
+            </button>
+
+            <button
+                class="my-drinks-sort-button"
+                type="button"
+                data-sort="used"
+                onclick="setMyDrinksSort('used')"
+            >
+                Most Used
+            </button>
+
+            <button
+                class="my-drinks-sort-button"
+                type="button"
+                data-sort="az"
+                onclick="setMyDrinksSort('az')"
+            >
+                A–Z
+            </button>
+
+        </div>
+
+
+        <div id="myDrinksList"></div>
+
+    </main>
+
+
+    <!-- SETTINGS -->
 
     <!-- SETTINGS -->
     <main
@@ -593,7 +684,7 @@
                 <button
                     class="danger"
                     type="button"
-                    onclick="resetData()"
+                    onclick="openResetModal()"
                 >
                     Reset
                 </button>
@@ -604,7 +695,7 @@
 
 
         <div class="app-version">
-            CaffTrack · v1.1.2
+            CaffTrack · v1.2.0
         </div>
 
     </main>
@@ -613,6 +704,7 @@
 
 
 <!-- BOTTOM NAV -->
+<!-- BOTTOM NAV -->
 <nav class="bottom-nav">
 
     <button
@@ -620,42 +712,126 @@
         type="button"
         onclick="showPage('home')"
     >
-        <span>🏠</span>
+        <span
+            class="nav-icon"
+            style="--icon: url('images/home.png');"
+        ></span>
         <small>Home</small>
     </button>
-
 
     <button
         class="nav-item"
         type="button"
         onclick="showPage('history')"
     >
-        <span>📅</span>
+        <span
+            class="nav-icon"
+            style="--icon: url('images/history.png');"
+        ></span>
         <small>History</small>
     </button>
 
+    <button
+        class="nav-item"
+        type="button"
+        onclick="showPage('drinks')"
+    >
+       <span
+    class="nav-icon"
+    style="--icon: url('images/mydrinks.png');"
+></span>
+<small>My Drinks</small>
+    </button>
 
     <button
         class="nav-item"
         type="button"
         onclick="showPage('progress')"
     >
-        <span>📈</span>
+        <span
+            class="nav-icon"
+            style="--icon: url('images/progress.png');"
+        ></span>
         <small>Progress</small>
     </button>
-
 
     <button
         class="nav-item"
         type="button"
         onclick="showPage('settings')"
     >
-        <span>⚙️</span>
+        <span
+            class="nav-icon"
+            style="--icon: url('images/settings.png');"
+        ></span>
         <small>Settings</small>
     </button>
 
 </nav>
 
+<!-- RESET MODAL -->
+<div
+    id="resetModal"
+    class="overlay"
+>
+    <div class="modal reset-modal">
+
+        <button
+            class="close-button"
+            type="button"
+            onclick="closeResetModal()"
+        >
+            ×
+        </button>
+
+        <p class="eyebrow">
+            RESET CAFFTRACK
+        </p>
+
+        <h2>
+            Are you sure?
+        </h2>
+
+        <p class="modal-subtitle">
+            This will erase your caffeine history,
+            streaks, progress, and commitment.
+        </p>
+
+        <label class="reset-drinks-option">
+
+            <input
+                id="resetMyDrinks"
+                type="checkbox"
+            >
+
+            <span>
+                Reset My Drinks
+            </span>
+
+        </label>
+
+        <div class="reset-modal-actions">
+
+            <button
+                class="reset-cancel-button"
+                type="button"
+                onclick="closeResetModal()"
+            >
+                Cancel
+            </button>
+
+            <button
+                class="reset-confirm-button"
+                type="button"
+                onclick="confirmResetData()"
+            >
+                Reset CaffTrack
+            </button>
+
+        </div>
+
+    </div>
+</div>
 
 <!-- LOG MODAL -->
 <div
@@ -744,16 +920,49 @@
         </div>
 
 
+    <div class="drink-picker">
+
+        
+
+    <input
+        id="drinkName"
+        class="text-input drink-name-input"
+        type="text"
+        placeholder="Drink name"
+        autocomplete="off"
+        onfocus="showDrinkSuggestions()"
+        oninput="showDrinkSuggestions()"
+    >
+
+    <div
+        id="drinkSuggestions"
+        class="drink-suggestions hidden"
+    ></div>
+
+</div>
+
+
+<!-- SAVE TO MY DRINKS -->
+<div
+    id="saveToMyDrinksOption"
+    class="save-to-my-drinks hidden"
+>
+    <label>
+
         <input
-            id="drinkName"
-            class="text-input"
-            type="text"
-            placeholder="Drink name"
-            autocomplete="off"
+            id="saveToMyDrinks"
+            type="checkbox"
         >
 
+        <span>
+            Save to My Drinks
+        </span>
 
-        <div class="amount-grid">
+    </label>
+</div>
+
+
+<div class="amount-grid">
 
             <button
                 type="button"
@@ -803,12 +1012,14 @@
         <div class="custom-input">
 
             <input
-                id="customAmount"
-                type="number"
-                min="1"
-                inputmode="numeric"
-                placeholder="Custom mg"
-            >
+    id="customAmount"
+    type="number"
+    min="1"
+    max="999"
+    step="1"
+    inputmode="numeric"
+    placeholder="Custom mg"
+>
 
             <button
                 type="button"
@@ -823,6 +1034,162 @@
 
 </div>
 
+<!-- ADD TO MY DRINKS MODAL -->
+<div
+    id="savedDrinkModal"
+    class="overlay"
+>
+
+    <div class="modal saved-drink-modal">
+
+        <button
+            class="close-button"
+            type="button"
+            onclick="closeNewSavedDrink()"
+        >
+            ×
+        </button>
+
+        <p class="eyebrow">
+            MY DRINKS
+        </p>
+
+        <h2>Add a drink</h2>
+
+        <p class="modal-subtitle">
+            Save a drink for faster logging later.
+        </p>
+
+
+        <label
+            class="logger-label"
+            for="savedDrinkName"
+        >
+            Drink name
+        </label>
+
+        <input
+            id="savedDrinkName"
+            class="text-input"
+            type="text"
+            placeholder="e.g. Monster Ultra"
+            autocomplete="off"
+        >
+
+
+        <label
+            class="logger-label"
+            for="savedDrinkAmount"
+        >
+            Caffeine
+        </label>
+
+        <div class="saved-drink-amount">
+
+            <input
+    id="savedDrinkAmount"
+    type="number"
+    min="1"
+    max="999"
+    step="1"
+    inputmode="numeric"
+    placeholder="150"
+>
+
+            <span>mg</span>
+
+        </div>
+
+
+        <button
+            class="save-drink-button"
+            type="button"
+            onclick="saveNewDrink()"
+        >
+            Save to My Drinks
+        </button>
+
+    </div>
+
+</div>
+
+<!-- EDIT SAVED DRINK MODAL -->
+<div
+    id="editSavedDrinkModal"
+    class="overlay"
+>
+    <div class="modal saved-drink-modal">
+
+        <button
+            class="close-button"
+            type="button"
+            onclick="closeEditSavedDrink()"
+        >
+            ×
+        </button>
+
+        <p class="eyebrow">
+            MY DRINKS
+        </p>
+
+        <h2>Edit drink</h2>
+
+        <p class="modal-subtitle">
+            Changes only affect this saved drink.
+            Previous History entries stay the same.
+        </p>
+
+        <input
+            id="editSavedDrinkId"
+            type="hidden"
+        >
+
+        <label
+            class="logger-label"
+            for="editSavedDrinkName"
+        >
+            Drink name
+        </label>
+
+        <input
+            id="editSavedDrinkName"
+            class="text-input"
+            type="text"
+            autocomplete="off"
+        >
+
+        <label
+            class="logger-label"
+            for="editSavedDrinkAmount"
+        >
+            Caffeine
+        </label>
+
+        <div class="saved-drink-amount">
+
+            <input
+    id="editSavedDrinkAmount"
+    type="number"
+    min="1"
+    max="999"
+    step="1"
+    inputmode="numeric"
+>
+
+            <span>mg</span>
+
+        </div>
+
+        <button
+            class="save-drink-button"
+            type="button"
+            onclick="saveEditedDrink()"
+        >
+            Save Changes
+        </button>
+
+    </div>
+</div>
 
 <!-- DEVELOPER -->
 <button
