@@ -1,5 +1,5 @@
 const STORAGE_KEY = "caffTrackData";
-const APP_VERSION = "1.2.2";
+const APP_VERSION = "1.2.3";
 const MAX_CAFFEINE_PER_DRINK = 999;
 
 let data = loadData();
@@ -2775,8 +2775,31 @@ function toggleMyDrinkMenu(id, event) {
 
     closeMyDrinkMenus();
 
-    if (!wasOpen) {
-        menu.classList.remove("hidden");
+    if (wasOpen) {
+        return;
+    }
+
+    menu.classList.remove("open-up");
+    menu.classList.remove("hidden");
+
+    const menuRect =
+        menu.getBoundingClientRect();
+
+    const nav =
+        document.querySelector(
+            ".bottom-nav"
+        );
+
+    const navTop =
+        nav
+            ? nav.getBoundingClientRect().top
+            : window.innerHeight;
+
+    const spaceBelow =
+        navTop - menuRect.top;
+
+    if (spaceBelow < menuRect.height + 10) {
+        menu.classList.add("open-up");
     }
 }
 
@@ -3106,14 +3129,40 @@ function saveEditedDrink() {
         return;
     }
 
-    drink.name = name;
-    drink.amount = amount;
+    const oldName =
+    normalizeDrinkName(drink.name);
 
-    saveData();
+const nameChanged =
+    oldName !== normalizeDrinkName(name);
 
-    closeEditSavedDrink();
+if (nameChanged) {
+    Object.values(data.days || {})
+        .forEach(day => {
+            if (!Array.isArray(day.entries)) {
+                return;
+            }
 
-    renderMyDrinks();
+            day.entries.forEach(entry => {
+                if (
+                    normalizeDrinkName(entry.name) ===
+                    oldName
+                ) {
+                    entry.name = name;
+                }
+            });
+        });
+}
+
+drink.name = name;
+drink.amount = amount;
+
+saveData();
+
+closeEditSavedDrink();
+
+updateApp();
+
+renderMyDrinks();
 }
 
 function logSavedDrink(id) {
@@ -3148,6 +3197,10 @@ function logSavedDrink(id) {
 ========================= */
 
 function addHistoryDrinksToMyDrinks() {
+    if (data.historyDrinksMigrated) {
+        return;
+    }
+
     const drinks = getMyDrinks();
 
     const existingNames =
@@ -3226,9 +3279,9 @@ function addHistoryDrinksToMyDrinks() {
         }
     );
 
-    if (added) {
-        saveData();
-    }
+    data.historyDrinksMigrated = true;
+
+saveData();
 }
 
 function normalizeDrinkName(name) {
