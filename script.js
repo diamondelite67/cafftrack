@@ -1,5 +1,5 @@
 const STORAGE_KEY = "caffTrackData";
-const APP_VERSION = "1.2.3";
+const APP_VERSION = "1.3.0";
 const MAX_CAFFEINE_PER_DRINK = 999;
 
 let data = loadData();
@@ -1316,15 +1316,1219 @@ function weeklyAverage() {
    HISTORY
 ========================= */
 
+function isDateInHistoryRange(key) {
+    const date =
+        new Date(key + "T00:00:00");
+
+    const today =
+        new Date(appDate());
+
+    date.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+
+    if (date > today) {
+        return false;
+    }
+
+    // WEEK — rolling 7 days
+    if (historyRange === "week") {
+        const start =
+            new Date(today);
+
+        start.setDate(
+            start.getDate() - 6
+        );
+
+        return (
+            date >= start &&
+            date <= today
+        );
+    }
+
+    // 30 DAYS — rolling 30 days
+    if (historyRange === "month") {
+        const start =
+            new Date(today);
+
+        start.setDate(
+            start.getDate() - 29
+        );
+
+        return (
+            date >= start &&
+            date <= today
+        );
+    }
+
+    // YEAR — rolling 365 days
+    if (historyRange === "year") {
+        const start =
+            new Date(today);
+
+        start.setDate(
+            start.getDate() - 364
+        );
+
+        return (
+            date >= start &&
+            date <= today
+        );
+    }
+
+    // ALL TIME
+    return true;
+}
+
+function setHistoryRange(range) {
+    if (
+    range !== "week" &&
+    range !== "month" &&
+    range !== "year" &&
+    range !== "all"
+) {
+        return;
+    }
+
+    historyRange = range;
+
+    document
+        .querySelectorAll(
+            ".history-range-button"
+        )
+        .forEach(button => {
+            button.classList.toggle(
+                "active",
+                button.dataset.range === range
+            );
+        });
+
+    renderHistory();
+
+    if (
+    !document
+        .getElementById("historyTrendPanel")
+        ?.classList.contains("hidden")
+) {
+    renderHistoryChart();
+}
+}
+
+function getHistoryRangeStats() {
+    const today = new Date(appDate());
+    today.setHours(0, 0, 0, 0);
+
+    let start;
+    let end = new Date(today);
+
+    let previousStart = null;
+    let previousEnd = null;
+
+    let label = "";
+    let title = "";
+
+    if (historyRange === "week") {
+        start = new Date(today);
+        start.setDate(
+            start.getDate() - 6
+        );
+
+        previousStart = new Date(today);
+        previousStart.setDate(
+            previousStart.getDate() - 13
+        );
+
+        previousEnd = new Date(today);
+        previousEnd.setDate(
+            previousEnd.getDate() - 7
+        );
+
+        label = "LAST 7 DAYS";
+        title = "Last 7 days";
+    }
+
+    else if (historyRange === "month") {
+    start = new Date(today);
+    start.setDate(
+        start.getDate() - 29
+    );
+
+    previousStart = new Date(today);
+    previousStart.setDate(
+        previousStart.getDate() - 59
+    );
+
+    previousEnd = new Date(today);
+    previousEnd.setDate(
+        previousEnd.getDate() - 30
+    );
+
+    label = "LAST 30 DAYS";
+    title = "Last 30 days";
+}
+
+    else if (historyRange === "year") {
+    start = new Date(today);
+    start.setDate(
+        start.getDate() - 364
+    );
+
+    previousStart = new Date(today);
+    previousStart.setDate(
+        previousStart.getDate() - 729
+    );
+
+    previousEnd = new Date(today);
+    previousEnd.setDate(
+        previousEnd.getDate() - 365
+    );
+
+    label = "LAST 365 DAYS";
+    title = "Last 365 days";
+}
+
+    else {
+        const commitment =
+            commitmentDate();
+
+        const historyKeys =
+            Object.keys(data.days || {})
+                .sort();
+
+        if (commitment) {
+            start =
+                new Date(commitment);
+        }
+
+        else if (historyKeys.length > 0) {
+            start =
+                new Date(
+                    historyKeys[0] +
+                    "T00:00:00"
+                );
+        }
+
+        else {
+            start =
+                new Date(today);
+        }
+
+        start.setHours(0, 0, 0, 0);
+
+        label = "ALL TIME";
+        title = "All time";
+    }
+
+    function calculateStats(
+        rangeStart,
+        rangeEnd
+    ) {
+        if (
+            !rangeStart ||
+            !rangeEnd ||
+            rangeStart > rangeEnd
+        ) {
+            return {
+                total: 0,
+                average: 0,
+                freeDays: 0,
+                days: 0
+            };
+        }
+
+        let total = 0;
+        let freeDays = 0;
+        let days = 0;
+
+        const cursor =
+            new Date(rangeStart);
+
+        while (cursor <= rangeEnd) {
+            const key =
+                dateKey(cursor);
+
+            const caffeine =
+                Number(
+                    data.days[key]
+                        ?.caffeine || 0
+                );
+
+            total += caffeine;
+
+            if (caffeine === 0) {
+                freeDays++;
+            }
+
+            days++;
+
+            cursor.setDate(
+                cursor.getDate() + 1
+            );
+        }
+
+        return {
+            total,
+            average:
+                days > 0
+                    ? Math.round(
+                        total / days
+                    )
+                    : 0,
+            freeDays,
+            days
+        };
+    }
+
+    const current =
+        calculateStats(
+            start,
+            end
+        );
+
+    const previous =
+        previousStart &&
+        previousEnd
+            ? calculateStats(
+                previousStart,
+                previousEnd
+            )
+            : null;
+
+    let comparison = "—";
+
+  if (historyRange === "all") {
+    const formattedStart =
+        start.toLocaleDateString(
+            "en-US",
+            {
+                month: "short",
+                day: "numeric",
+                year: "numeric"
+            }
+        );
+
+    comparison =
+        `Since you started tracking · ${formattedStart}`;
+}
+    else if (previous) {
+        if (
+            previous.total === 0 &&
+            current.total === 0
+        ) {
+            comparison =
+                "No change from previous period";
+        }
+
+        else if (previous.total === 0) {
+            comparison =
+                "No previous caffeine to compare";
+        }
+
+        else {
+            const percent =
+                Math.round(
+                    (
+                        (
+                            current.total -
+                            previous.total
+                        ) /
+                        previous.total
+                    ) * 100
+                );
+
+            if (percent === 0) {
+                comparison =
+                    "No change from previous period";
+            }
+
+            else if (percent < 0) {
+                comparison =
+                    `${Math.abs(percent)}% lower than previous period`;
+            }
+
+            else {
+                comparison =
+                    `${percent}% higher than previous period`;
+            }
+        }
+    }
+
+    return {
+        ...current,
+        label,
+        title,
+        comparison
+    };
+}
+
+function renderHistoryChart() {
+    const container =
+        document.getElementById(
+            "historyChart"
+        );
+
+    if (!container) {
+        return;
+    }
+
+    container.innerHTML = "";
+
+    const today =
+        new Date(appDate());
+
+    today.setHours(0, 0, 0, 0);
+
+    let start;
+
+    // =========================
+    // RANGE
+    // =========================
+
+    if (historyRange === "week") {
+        start = new Date(today);
+
+        start.setDate(
+            start.getDate() - 6
+        );
+    }
+
+    else if (historyRange === "month") {
+        start = new Date(today);
+
+        start.setDate(
+            start.getDate() - 29
+        );
+    }
+
+    else if (historyRange === "year") {
+        start = new Date(today);
+
+        start.setDate(
+            start.getDate() - 364
+        );
+    }
+
+    else {
+        const commitment =
+            commitmentDate();
+
+        const keys =
+            Object.keys(data.days || {})
+                .sort();
+
+        if (commitment) {
+            start =
+                new Date(commitment);
+        }
+
+        else if (keys.length) {
+            start =
+                new Date(
+                    keys[0] +
+                    "T00:00:00"
+                );
+        }
+
+        else {
+            start =
+                new Date(today);
+        }
+    }
+
+    start.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+
+    // =========================
+    // DAILY POINTS
+    // =========================
+
+    const points = [];
+
+    const cursor =
+        new Date(start);
+
+    while (cursor <= today) {
+        const key =
+            dateKey(cursor);
+
+        const day =
+            data.days[key] || {};
+
+        points.push({
+            key,
+            date:
+                new Date(cursor),
+
+            value:
+                Number(
+                    day.caffeine || 0
+                ),
+
+            entries:
+                Array.isArray(
+                    day.entries
+                )
+                    ? day.entries
+                    : []
+        });
+
+        cursor.setDate(
+            cursor.getDate() + 1
+        );
+    }
+
+    if (!points.length) {
+        return;
+    }
+
+
+    // =========================
+    // SVG SETUP
+    // =========================
+
+    const width = 700;
+    const height = 260;
+
+    const padding = {
+        top: 22,
+        right: 18,
+        bottom: 42,
+        left: 46
+    };
+
+    const chartWidth =
+        width -
+        padding.left -
+        padding.right;
+
+    const chartHeight =
+        height -
+        padding.top -
+        padding.bottom;
+
+
+    // =========================
+    // Y AXIS
+    // 25 MG INCREMENTS
+    // =========================
+
+    const actualMax =
+        Math.max(
+            ...points.map(
+                point =>
+                    point.value
+            ),
+            0
+        );
+
+    const yStep = 25;
+
+    const yMax =
+        Math.max(
+            25,
+            Math.ceil(
+                actualMax /
+                yStep
+            ) * yStep
+        );
+
+
+    // =========================
+    // POSITION HELPERS
+    // =========================
+
+    const xForIndex =
+        index => {
+            if (
+                points.length === 1
+            ) {
+                return (
+                    padding.left +
+                    chartWidth / 2
+                );
+            }
+
+            return (
+                padding.left +
+                (
+                    index /
+                    (
+                        points.length -
+                        1
+                    )
+                ) *
+                chartWidth
+            );
+        };
+
+    const yForValue =
+        value =>
+            padding.top +
+            chartHeight -
+            (
+                value /
+                yMax
+            ) *
+            chartHeight;
+
+
+    // =========================
+    // SVG
+    // =========================
+
+    const svgNS =
+        "http://www.w3.org/2000/svg";
+
+    const svg =
+        document.createElementNS(
+            svgNS,
+            "svg"
+        );
+
+    svg.setAttribute(
+        "viewBox",
+        `0 0 ${width} ${height}`
+    );
+
+    svg.setAttribute(
+        "class",
+        "history-line-chart"
+    );
+
+    svg.setAttribute(
+        "role",
+        "img"
+    );
+
+    svg.setAttribute(
+        "aria-label",
+        "Caffeine trend"
+    );
+
+
+    // =========================
+    // GRID
+    // =========================
+
+    const gridSteps =
+        yMax / yStep;
+
+    for (
+        let i = 0;
+        i <= gridSteps;
+        i++
+    ) {
+        const value =
+            yMax -
+            yStep * i;
+
+        const y =
+            padding.top +
+            (
+                chartHeight /
+                gridSteps
+            ) * i;
+
+        const line =
+            document.createElementNS(
+                svgNS,
+                "line"
+            );
+
+        line.setAttribute(
+            "x1",
+            padding.left
+        );
+
+        line.setAttribute(
+            "x2",
+            width -
+            padding.right
+        );
+
+        line.setAttribute(
+            "y1",
+            y
+        );
+
+        line.setAttribute(
+            "y2",
+            y
+        );
+
+        line.setAttribute(
+            "class",
+            "history-grid-line"
+        );
+
+        svg.appendChild(line);
+
+
+        const text =
+            document.createElementNS(
+                svgNS,
+                "text"
+            );
+
+        text.setAttribute(
+            "x",
+            padding.left - 9
+        );
+
+        text.setAttribute(
+            "y",
+            y + 4
+        );
+
+        text.setAttribute(
+            "text-anchor",
+            "end"
+        );
+
+        text.setAttribute(
+            "class",
+            "history-axis-label"
+        );
+
+        text.textContent =
+            value;
+
+        svg.appendChild(text);
+    }
+
+
+    // =========================
+    // TREND LINE
+    // =========================
+
+    const path =
+        document.createElementNS(
+            svgNS,
+            "path"
+        );
+
+    const pathData =
+        points
+            .map(
+                (point, index) => {
+                    const x =
+                        xForIndex(index);
+
+                    const y =
+                        yForValue(
+                            point.value
+                        );
+
+                    return (
+                        index === 0
+                            ? `M ${x} ${y}`
+                            : `L ${x} ${y}`
+                    );
+                }
+            )
+            .join(" ");
+
+    path.setAttribute(
+        "d",
+        pathData
+    );
+
+    path.setAttribute(
+        "class",
+        "history-trend-line"
+    );
+
+    svg.appendChild(path);
+
+
+    // =========================
+    // TOOLTIP
+    // =========================
+
+    const tooltip =
+        document.createElement(
+            "div"
+        );
+
+    tooltip.className =
+        "history-chart-tooltip";
+
+    container.appendChild(
+        tooltip
+    );
+
+
+    function showTooltip(
+        point,
+        event
+    ) {
+        const date =
+            point.date
+                .toLocaleDateString(
+                    "en-US",
+                    {
+                        weekday:
+                            "short",
+                        month:
+                            "short",
+                        day:
+                            "numeric",
+                        year:
+                            "numeric"
+                    }
+                );
+
+        const drinks =
+            point.entries.length
+                ? point.entries
+                    .map(entry => `
+                        <div class="history-tooltip-drink">
+                            <span>
+                                ${escapeHTML(
+                                    entry.name ||
+                                    "Caffeine"
+                                )}
+                            </span>
+
+                            <strong>
+                                ${Number(
+                                    entry.amount || 0
+                                )} mg
+                            </strong>
+                        </div>
+                    `)
+                    .join("")
+                : `
+                    <div class="history-tooltip-empty">
+                        No caffeine logged
+                    </div>
+                `;
+
+        tooltip.innerHTML = `
+            <strong class="history-tooltip-date">
+                ${date}
+            </strong>
+
+            ${drinks}
+
+            <div class="history-tooltip-total">
+                <span>Total</span>
+
+                <strong>
+                    ${point.value} mg
+                </strong>
+            </div>
+        `;
+
+        tooltip.classList.add(
+            "visible"
+        );
+
+        positionTooltip(event);
+    }
+
+
+    function positionTooltip(event) {
+        const rect =
+            container
+                .getBoundingClientRect();
+
+        let left =
+            event.clientX -
+            rect.left +
+            12;
+
+        let top =
+            event.clientY -
+            rect.top -
+            10;
+
+        const tooltipWidth =
+            tooltip.offsetWidth;
+
+        const tooltipHeight =
+            tooltip.offsetHeight;
+
+        if (
+            left +
+            tooltipWidth >
+            rect.width - 6
+        ) {
+            left =
+                event.clientX -
+                rect.left -
+                tooltipWidth -
+                12;
+        }
+
+        if (top < 6) {
+            top = 6;
+        }
+
+        if (
+            top +
+            tooltipHeight >
+            rect.height - 6
+        ) {
+            top =
+                rect.height -
+                tooltipHeight -
+                6;
+        }
+
+        tooltip.style.left =
+            left + "px";
+
+        tooltip.style.top =
+            top + "px";
+    }
+
+
+    function hideTooltip() {
+        tooltip.classList.remove(
+            "visible"
+        );
+    }
+
+
+    // =========================
+    // DATA POINTS
+    // =========================
+
+    points.forEach(
+        (point, index) => {
+            const x =
+                xForIndex(index);
+
+            const y =
+                yForValue(
+                    point.value
+                );
+
+            const circle =
+                document.createElementNS(
+                    svgNS,
+                    "circle"
+                );
+
+            circle.setAttribute(
+                "cx",
+                x
+            );
+
+            circle.setAttribute(
+                "cy",
+                y
+            );
+
+            circle.setAttribute(
+                "r",
+                point.value > 0
+                    ? "4.5"
+                    : "3"
+            );
+
+            circle.setAttribute(
+                "class",
+                point.value > 0
+                    ? "history-trend-point"
+                    : "history-trend-point history-zero-point"
+            );
+
+            circle.addEventListener(
+                "mouseenter",
+                event => {
+                    showTooltip(
+                        point,
+                        event
+                    );
+                }
+            );
+
+            circle.addEventListener(
+                "mousemove",
+                event => {
+                    positionTooltip(
+                        event
+                    );
+                }
+            );
+
+            circle.addEventListener(
+                "mouseleave",
+                hideTooltip
+            );
+
+            // Touch / mobile
+            circle.addEventListener(
+                "click",
+                event => {
+                    event.stopPropagation();
+
+                    showTooltip(
+                        point,
+                        event
+                    );
+                }
+            );
+
+            svg.appendChild(
+                circle
+            );
+        }
+    );
+
+
+    // =========================
+    // X AXIS LABELS
+    // =========================
+
+    let desiredLabels;
+
+    if (
+        historyRange === "week"
+    ) {
+        desiredLabels = 7;
+    }
+
+    else if (
+        historyRange === "month"
+    ) {
+        desiredLabels = 6;
+    }
+
+    else {
+        desiredLabels = 7;
+    }
+
+
+    const labelIndexes =
+        new Set();
+
+    labelIndexes.add(0);
+
+    labelIndexes.add(
+        points.length - 1
+    );
+
+
+    if (points.length > 2) {
+        const intervals =
+            Math.max(
+                1,
+                desiredLabels - 1
+            );
+
+        for (
+            let i = 1;
+            i < intervals;
+            i++
+        ) {
+            const index =
+                Math.round(
+                    (
+                        i /
+                        intervals
+                    ) *
+                    (
+                        points.length -
+                        1
+                    )
+                );
+
+            labelIndexes.add(
+                index
+            );
+        }
+    }
+
+
+    [...labelIndexes]
+        .sort(
+            (a, b) =>
+                a - b
+        )
+        .forEach(index => {
+            const point =
+                points[index];
+
+            const x =
+                xForIndex(index);
+
+            const text =
+                document.createElementNS(
+                    svgNS,
+                    "text"
+                );
+
+            text.setAttribute(
+                "x",
+                x
+            );
+
+            text.setAttribute(
+                "y",
+                height - 13
+            );
+
+            text.setAttribute(
+                "text-anchor",
+                "middle"
+            );
+
+            text.setAttribute(
+                "class",
+                "history-axis-label history-x-label"
+            );
+
+
+            if (
+                historyRange === "all"
+            ) {
+                text.textContent =
+                    point.date
+                        .toLocaleDateString(
+                            "en-US",
+                            {
+                                month:
+                                    "numeric",
+                                day:
+                                    "numeric",
+                                year:
+                                    "2-digit"
+                            }
+                        );
+            }
+
+            else {
+                text.textContent =
+                    point.date
+                        .toLocaleDateString(
+                            "en-US",
+                            {
+                                month:
+                                    "numeric",
+                                day:
+                                    "numeric"
+                            }
+                        );
+            }
+
+
+            svg.appendChild(
+                text
+            );
+        });
+
+
+    container.appendChild(svg);
+
+
+    // Clicking outside a point
+    // closes the mobile tooltip.
+    svg.addEventListener(
+        "click",
+        event => {
+            if (
+                event.target.tagName
+                    .toLowerCase() !==
+                "circle"
+            ) {
+                hideTooltip();
+            }
+        }
+    );
+}
+
+function toggleHistoryTrend() {
+    const panel =
+        document.getElementById(
+            "historyTrendPanel"
+        );
+
+    const button =
+        document.getElementById(
+            "historyTrendButton"
+        );
+
+    const arrow =
+        document.getElementById(
+            "historyTrendArrow"
+        );
+
+    if (!panel || !button || !arrow) {
+        return;
+    }
+
+    const willOpen =
+        panel.classList.contains("hidden");
+
+    panel.classList.toggle(
+        "hidden",
+        !willOpen
+    );
+
+    const text =
+        button.querySelector("span:first-child");
+
+    if (text) {
+        text.textContent =
+            willOpen
+                ? "Hide Trend"
+                : "See Trend";
+    }
+
+    arrow.textContent =
+        willOpen
+            ? "↑"
+            : "↓";
+
+if (willOpen) {
+    renderHistoryChart();
+}
+}
+
 function renderHistory() {
+    const stats =
+        getHistoryRangeStats();
+
     setText(
-        "historyWeekTotal",
-        sevenDayTotal() + " mg"
+        "historyRangeLabel",
+        stats.label
     );
 
     setText(
-        "historyFreeDays",
-        freeDays() + " days"
+        "historyRangeTotal",
+        stats.total
+    );
+
+    setText(
+        "historyRangeAverage",
+        stats.average
+    );
+
+    setText(
+        "historyRangeFreeDays",
+        stats.freeDays
+    );
+
+    setText(
+        "historyComparison",
+        stats.comparison
+    );
+
+    setText(
+        "historyTrendTitle",
+        stats.title
+    );
+
+    setText(
+        "historyEntriesTitle",
+        stats.title
     );
 
     const container =
@@ -1339,25 +2543,29 @@ function renderHistory() {
     container.innerHTML = "";
 
     const keys =
-        Object.keys(data.days)
-            .filter(key => {
-                const day =
-                    data.days[key];
+    Object.keys(data.days)
+        .filter(key => {
+            const day =
+                data.days[key];
 
-                return (
-                    Number(
-                        day.caffeine || 0
-                    ) > 0 ||
-                    (
-                        Array.isArray(
-                            day.entries
-                        ) &&
-                        day.entries.length > 0
-                    )
+            const hasHistory =
+                Number(
+                    day.caffeine || 0
+                ) > 0 ||
+                (
+                    Array.isArray(
+                        day.entries
+                    ) &&
+                    day.entries.length > 0
                 );
-            })
-            .sort()
-            .reverse();
+
+            return (
+                hasHistory &&
+                isDateInHistoryRange(key)
+            );
+        })
+        .sort()
+        .reverse();
 
     if (keys.length === 0) {
         const empty =
@@ -1397,10 +2605,13 @@ function renderHistory() {
             date.toLocaleDateString(
                 "en-US",
                 {
-                    weekday: "short",
-                    month: "short",
-                    day: "numeric"
-                }
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    ...(historyRange === "all"
+        ? { year: "numeric" }
+        : {})
+}
             );
 
         row.innerHTML = `
@@ -1556,6 +2767,336 @@ function renderHistory() {
    PROGRESS
 ========================= */
 
+/* =========================
+   PERSONAL RECORDS
+========================= */
+
+function getPersonalRecords() {
+    const start =
+        commitmentDate();
+
+    const today =
+        new Date(appDate());
+
+    today.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+    if (!start) {
+        return {
+            longestStreak: null,
+            lowest7: null,
+            lowest30: null,
+            mostFreeDays: null,
+            biggestReduction: null
+        };
+    }
+
+    start.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+
+    // =========================
+    // BUILD DAILY HISTORY
+    // =========================
+
+    const days = [];
+
+    const cursor =
+        new Date(start);
+
+    while (cursor <= today) {
+        const key =
+            dateKey(cursor);
+
+        days.push({
+            date:
+                new Date(cursor),
+
+            caffeine:
+                Number(
+                    data.days[key]
+                        ?.caffeine || 0
+                )
+        });
+
+        cursor.setDate(
+            cursor.getDate() + 1
+        );
+    }
+
+
+    // =========================
+    // LONGEST FREE STREAK
+    // =========================
+
+    let currentStreak = 0;
+    let longestStreak = 0;
+
+    days.forEach(day => {
+        if (day.caffeine === 0) {
+            currentStreak++;
+
+            longestStreak =
+                Math.max(
+                    longestStreak,
+                    currentStreak
+                );
+        }
+
+        else {
+            currentStreak = 0;
+        }
+    });
+
+
+    // =========================
+    // LOWEST 7-DAY AVERAGE
+    // =========================
+
+    let lowest7 = null;
+
+    if (days.length >= 7) {
+        for (
+            let i = 0;
+            i <= days.length - 7;
+            i++
+        ) {
+            const window =
+                days.slice(
+                    i,
+                    i + 7
+                );
+
+            const total =
+                window.reduce(
+                    (sum, day) =>
+                        sum +
+                        day.caffeine,
+                    0
+                );
+
+            const average =
+                total / 7;
+
+            if (
+                lowest7 === null ||
+                average < lowest7
+            ) {
+                lowest7 = average;
+            }
+        }
+
+        lowest7 =
+            Math.round(lowest7);
+    }
+
+
+    // =========================
+    // 30-DAY RECORDS
+    // =========================
+
+    let lowest30 = null;
+    let mostFreeDays = null;
+
+    if (days.length >= 30) {
+        mostFreeDays = 0;
+
+        for (
+            let i = 0;
+            i <= days.length - 30;
+            i++
+        ) {
+            const window =
+                days.slice(
+                    i,
+                    i + 30
+                );
+
+            const total =
+                window.reduce(
+                    (sum, day) =>
+                        sum +
+                        day.caffeine,
+                    0
+                );
+
+            const average =
+                total / 30;
+
+            if (
+                lowest30 === null ||
+                average < lowest30
+            ) {
+                lowest30 =
+                    average;
+            }
+
+
+            const freeDays =
+                window.filter(
+                    day =>
+                        day.caffeine === 0
+                ).length;
+
+            mostFreeDays =
+                Math.max(
+                    mostFreeDays,
+                    freeDays
+                );
+        }
+
+        lowest30 =
+            Math.round(lowest30);
+    }
+
+
+    // =========================
+    // BIGGEST 7-DAY REDUCTION
+    // =========================
+
+    let biggestReduction = null;
+
+    if (days.length >= 14) {
+        biggestReduction = 0;
+
+        for (
+            let i = 7;
+            i <= days.length - 7;
+            i += 7
+        ) {
+            const previous =
+                days.slice(
+                    i - 7,
+                    i
+                );
+
+            const current =
+                days.slice(
+                    i,
+                    i + 7
+                );
+
+            if (
+                current.length < 7
+            ) {
+                continue;
+            }
+
+            const previousTotal =
+                previous.reduce(
+                    (sum, day) =>
+                        sum +
+                        day.caffeine,
+                    0
+                );
+
+            const currentTotal =
+                current.reduce(
+                    (sum, day) =>
+                        sum +
+                        day.caffeine,
+                    0
+                );
+
+            const reduction =
+                previousTotal -
+                currentTotal;
+
+            if (
+                reduction >
+                biggestReduction
+            ) {
+                biggestReduction =
+                    reduction;
+            }
+        }
+    }
+
+
+    return {
+        longestStreak,
+        lowest7,
+        lowest30,
+        mostFreeDays,
+        biggestReduction
+    };
+}
+
+
+function renderPersonalRecords() {
+    const records =
+        getPersonalRecords();
+
+
+    setText(
+        "recordLongestStreak",
+        records.longestStreak ??
+        "—"
+    );
+
+
+    setText(
+        "recordLowest7",
+        records.lowest7 ??
+        "—"
+    );
+
+
+    setText(
+        "recordLowest30",
+        records.lowest30 ??
+        "—"
+    );
+
+
+    setText(
+        "recordMostFreeDays",
+        records.mostFreeDays ??
+        "—"
+    );
+
+
+    setText(
+        "recordBiggestReduction",
+        records.biggestReduction ??
+        "—"
+    );
+}
+
+function daysSinceCommitment() {
+    const start =
+        commitmentDate();
+
+    if (!start) {
+        return 0;
+    }
+
+    const today =
+        new Date(appDate());
+
+    start.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+
+    const difference =
+        Math.floor(
+            (today - start) /
+            86400000
+        );
+
+    return Math.max(
+        0,
+        difference
+    );
+}
+
 function renderProgress() {
     const totalLogged =
         Object.values(data.days)
@@ -1643,6 +3184,28 @@ function renderProgress() {
     );
 
     renderMilestones();
+
+    setText(
+    "daysSinceCommitment",
+    daysSinceCommitment()
+);
+
+const committed =
+    commitmentDate();
+
+setText(
+    "progressCommitmentDate",
+    committed
+        ? committed.toLocaleDateString(
+            "en-US",
+            {
+                month: "short",
+                day: "numeric",
+                year: "numeric"
+            }
+        )
+        : "—"
+);
 }
 
 
@@ -1807,6 +3370,84 @@ function resetDev() {
     updateApp();
 }
 
+function updateCommitmentDateDisplay() {
+    const display =
+        document.getElementById(
+            "commitmentDateDisplay"
+        );
+
+    if (!display) {
+        return;
+    }
+
+    const date =
+        commitmentDate();
+
+    if (!date) {
+        display.textContent = "—";
+        return;
+    }
+
+    display.textContent =
+        date.toLocaleDateString(
+            "en-US",
+            {
+                month: "short",
+                day: "numeric",
+                year: "numeric"
+            }
+        );
+}
+
+
+function changeDevCommitmentDate() {
+    if (!isLocalVersion()) {
+        return;
+    }
+
+    const input =
+        document.getElementById(
+            "devCommitmentDate"
+        );
+
+    if (
+        !input ||
+        !input.value
+    ) {
+        return;
+    }
+
+    const selected =
+        new Date(
+            input.value +
+            "T00:00:00"
+        );
+
+    const today =
+        new Date();
+
+    today.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+    if (selected > today) {
+        alert(
+            "Commitment date can't be in the future."
+        );
+
+        return;
+    }
+
+    data.commitment =
+        input.value;
+
+    saveData();
+
+    updateApp();
+}
 
 function updateDev() {
     const date =
@@ -1814,20 +3455,31 @@ function updateDev() {
             "devDate"
         );
 
-    if (!date) {
-        return;
+    if (date) {
+        date.textContent =
+            appDate().toLocaleDateString(
+                "en-US",
+                {
+                    weekday: "long",
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric"
+                }
+            );
     }
 
-    date.textContent =
-        appDate().toLocaleDateString(
-            "en-US",
-            {
-                weekday: "long",
-                month: "long",
-                day: "numeric",
-                year: "numeric"
-            }
+    const commitmentInput =
+        document.getElementById(
+            "devCommitmentDate"
         );
+
+    if (commitmentInput) {
+        commitmentInput.value =
+            data.commitment || "";
+
+        commitmentInput.max =
+            dateKey(new Date());
+    }
 }
 
 
@@ -2348,6 +4000,7 @@ function escapeHTML(value) {
 ========================= */
 
 let myDrinksSort = "recent";
+let historyRange = "week";
 
 
 function getMyDrinks() {
@@ -3678,6 +5331,10 @@ function updateApp() {
     renderHistory();
 
     renderProgress();
+
+renderPersonalRecords();
+
+updateCommitmentDateDisplay();
 
     updateDev();
 }

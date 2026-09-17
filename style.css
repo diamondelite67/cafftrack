@@ -1964,3 +1964,595 @@ body.dark-mode .commitment-card small {
 
     filter: drop-shadow(0 0 5px rgba(255, 214, 10, 0.25));
 }
+
+/* =========================
+   HISTORY V1.3
+   ========================= */
+
+/* RANGE SELECTOR */
+
+.history-range {
+    display: grid;
+   grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+
+    margin: 0 0 18px;
+    padding: 4px;
+
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+}
+
+.history-range-button {
+    padding: 10px 8px;
+
+    border: 0;
+    border-radius: 10px;
+
+    background: transparent;
+    color: var(--muted);
+
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.history-range-button.active {
+    background: var(--white);
+    color: var(--blue);
+
+    box-shadow:
+        0 2px 8px rgba(20, 35, 45, 0.08);
+}
+
+
+/* SUMMARY */
+
+.history-insights-card {
+    margin-bottom: 26px;
+
+    overflow: hidden;
+
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+
+    box-shadow:
+        0 8px 24px rgba(20, 35, 45, 0.06);
+}
+
+.history-total {
+    padding: 20px;
+}
+
+.history-stat-label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: var(--muted);
+
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+}
+
+.history-total-number {
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+}
+
+.history-total-number strong {
+    color: var(--text);
+
+    font-size: 34px;
+    line-height: 1;
+}
+
+.history-total-number span {
+    color: var(--muted);
+
+    font-size: 14px;
+    font-weight: 700;
+}
+
+#historyComparison {
+    display: block;
+
+    margin-top: 8px;
+
+    color: var(--muted);
+
+    font-size: 11px;
+}
+
+.history-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+
+    border-top: 1px solid var(--border);
+}
+
+.history-stat-grid > div {
+    padding: 16px 20px;
+}
+
+.history-stat-grid > div + div {
+    border-left: 1px solid var(--border);
+}
+
+.history-stat-grid strong {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+
+    color: var(--text);
+
+    font-size: 20px;
+}
+
+.history-stat-grid strong small {
+    color: var(--muted);
+
+    font-size: 11px;
+    font-weight: 600;
+}
+
+
+/* TREND */
+
+.history-trend-section {
+    margin-bottom: 26px;
+}
+
+.history-chart-card {
+    padding: 18px;
+}
+
+.history-chart {
+    width: 100%;
+    min-height: 180px;
+}
+
+
+/* HISTORY ENTRY HEADING */
+
+#historyEntriesTitle,
+#historyTrendTitle {
+    margin-top: 2px;
+}
+/* HISTORY TREND TOGGLE */
+
+.history-trend-toggle {
+    margin: -8px 0 18px;
+}
+
+.history-trend-button {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    padding: 11px 14px;
+
+    border: 0;
+    background: transparent;
+
+    color: var(--blue);
+
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+.history-trend-panel {
+    margin-bottom: 26px;
+}
+
+.history-trend-panel.hidden {
+    display: none;
+}
+
+/* =========================
+   HISTORY TREND CHART
+========================= */
+
+.history-trend-toggle {
+    margin: 12px 0 0;
+    text-align: center;
+}
+
+.history-trend-button {
+    padding: 8px 12px;
+    background: transparent;
+    color: var(--blue);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.history-trend-button span:last-child {
+    margin-left: 4px;
+}
+
+.history-trend-panel {
+    margin-top: 18px;
+    margin-bottom: 24px;
+}
+
+.history-chart-card {
+    padding: 18px 12px 14px;
+    overflow-x: auto;
+}
+
+.history-chart {
+    height: 170px;
+    display: flex;
+    align-items: stretch;
+    gap: 7px;
+    min-width: 100%;
+}
+
+.history-chart-column {
+    min-width: 24px;
+    height: 100%;
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+
+    font-size: 9px;
+}
+
+.history-chart-value {
+    min-height: 14px;
+    margin-bottom: 4px;
+
+    color: var(--muted);
+    font-size: 8px;
+    font-weight: 700;
+}
+
+.history-chart-bar {
+    width: 100%;
+    max-width: 22px;
+    min-height: 4px;
+
+    border-radius: 6px 6px 3px 3px;
+
+    background: #b9cfdf;
+}
+
+.history-chart-bar.current {
+    background: var(--blue);
+}
+
+.history-chart-column small {
+    margin-top: 6px;
+
+    color: var(--muted);
+    font-size: 8px;
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+/* MONTH CHART — FIT ALL 30 DAYS */
+
+.history-chart-card {
+    overflow: hidden;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.history-chart {
+    width: 100%;
+    min-width: 0;
+    gap: 2px;
+}
+
+.history-chart-column {
+    min-width: 0;
+    flex: 1 1 0;
+}
+
+.history-chart-bar {
+    width: 70%;
+    min-width: 2px;
+}
+/* =========================
+   HISTORY LINE TREND
+========================= */
+
+.history-chart-card {
+    padding: 12px 10px 8px;
+    overflow: hidden;
+}
+
+.history-chart {
+    width: 100%;
+    height: auto;
+    min-width: 0;
+}
+
+.history-line-chart {
+    display: block;
+
+    width: 100%;
+    height: auto;
+
+    overflow: visible;
+}
+
+.history-grid-line {
+    stroke: var(--border);
+    stroke-width: 1;
+}
+
+.history-axis-label {
+    fill: var(--muted);
+
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.history-x-label {
+    font-size: 10px;
+}
+
+.history-trend-line {
+    fill: none;
+
+    stroke: var(--blue);
+    stroke-width: 4;
+
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.history-trend-point {
+    fill: var(--white);
+
+    stroke: var(--blue);
+    stroke-width: 3;
+}
+.commitment-date-display {
+    flex-shrink: 0;
+
+    color: var(--blue);
+
+    font-size: 13px;
+    font-weight: 800;
+
+    white-space: nowrap;
+}
+
+.dev-commitment {
+    display: grid;
+    gap: 7px;
+
+    margin: 12px 0;
+}
+
+.dev-commitment label {
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.dev-commitment input {
+    padding: 8px;
+
+    border: 1px solid var(--border);
+    border-radius: 8px;
+
+    background: var(--white);
+    color: var(--text);
+}
+/* =========================
+   HISTORY CHART TOOLTIP
+========================= */
+
+.history-chart {
+    position: relative;
+}
+
+.history-chart-tooltip {
+    position: absolute;
+    z-index: 20;
+
+    display: none;
+
+    min-width: 160px;
+    max-width: 220px;
+
+    padding: 10px 12px;
+
+    border: 1px solid var(--border);
+    border-radius: 10px;
+
+    background: var(--white);
+    color: var(--text);
+
+    box-shadow:
+        0 6px 20px
+        rgba(0, 0, 0, 0.14);
+
+    font-size: 11px;
+
+    pointer-events: none;
+}
+
+.history-chart-tooltip.visible {
+    display: block;
+}
+
+.history-tooltip-date {
+    display: block;
+
+    margin-bottom: 7px;
+
+    font-size: 12px;
+}
+
+.history-tooltip-drink {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+
+    padding: 3px 0;
+}
+
+.history-tooltip-drink span {
+    color: var(--muted);
+}
+
+.history-tooltip-drink strong {
+    white-space: nowrap;
+}
+
+.history-tooltip-empty {
+    padding: 3px 0 6px;
+
+    color: var(--muted);
+}
+
+.history-tooltip-total {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+
+    margin-top: 6px;
+    padding-top: 7px;
+
+    border-top: 1px solid var(--border);
+}
+
+.history-zero-point {
+    opacity: 0.35;
+}
+/* =========================
+   ACHIEVEMENTS
+========================= */
+
+.achievements-section {
+    margin-top: 4px;
+}
+
+.achievements-card {
+    overflow: hidden;
+
+    background: var(--white);
+
+    border: 1px solid var(--border);
+    border-radius: 17px;
+
+    box-shadow: var(--shadow);
+}
+
+.achievements-group {
+    padding: 16px;
+}
+
+.achievements-group + .achievements-group {
+    border-top: 1px solid var(--border);
+}
+
+.achievements-label {
+    margin: 0 0 10px;
+
+    color: var(--muted);
+
+    font-size: 9px;
+    font-weight: 800;
+
+    letter-spacing: 1px;
+}
+
+
+/* PERSONAL RECORDS */
+
+.personal-record {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 11px 0;
+
+    border-bottom: 1px solid var(--border);
+}
+
+.personal-record:last-child {
+    border-bottom: 0;
+}
+
+.personal-record-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 36px;
+    height: 36px;
+
+    flex-shrink: 0;
+
+    border-radius: 10px;
+
+    background: var(--blue-light);
+
+    font-size: 17px;
+}
+
+.personal-record-info {
+    min-width: 0;
+}
+
+.personal-record-info small {
+    display: block;
+
+    margin-bottom: 3px;
+
+    color: var(--muted);
+
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.personal-record-info strong {
+    display: block;
+
+    color: var(--text);
+
+    font-size: 15px;
+    font-weight: 800;
+}
+
+
+/* MILESTONES INSIDE ACHIEVEMENTS */
+
+.milestones-group .milestone {
+    margin-bottom: 8px;
+
+    background: var(--background);
+
+    box-shadow: none;
+}
+
+.milestones-group .milestone:last-child {
+    margin-bottom: 0;
+}
